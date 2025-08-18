@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// server/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum for user profiles (selected during registration)
+enum UserProfile {
+  Student
+  Teacher
+  JobProfessional
+}
+
+// Enum for system roles (determines permissions)
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  userId    String   @unique @map("user_id") // The custom generated ID like STU-ABC2025-XYZ
+  email     String   @unique
+  name      String
+  password  String   // We will store a hashed password
+  profile   UserProfile // What the user identifies as
+  role      Role     @default(STUDENT) // System permission role
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  instructorProfile InstructorProfile?
+  courses           Course[]
+
+  @@map("users")
+}
+
+model InstructorProfile {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique
+  user             User     @relation(fields: [userId], references: [id])
+  specialization   String
+  bio              String?
+  isApproved       Boolean  @default(false) @map("is_approved")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("instructor_profiles")
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  isPublished Boolean  @default(false)
+  instructorId Int
+  instructor  User     @relation(fields: [instructorId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("courses")
+}
