@@ -89,8 +89,8 @@ export default function TrainingInternship() {
 
   const testimonials = [
     {
-      name: "Priya Sharma",
-      role: "Security Analyst at CyberTech",
+      name: "Riya Birnale",
+      role: "Full Stack Developer at Cyber Secured India",
       image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
       quote: "This program transformed my career. The combination of training and internship gave me real-world experience."
     },

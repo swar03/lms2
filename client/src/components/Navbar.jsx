@@ -8,7 +8,6 @@ import {
   GraduationCap, 
   Menu, 
   X, 
-  Shield,
   ChevronDown 
 } from "lucide-react";
 
@@ -24,34 +23,35 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-800 shadow-xl border-b border-white/10 sticky top-0 z-50 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <a href="/" className="flex items-center space-x-3 group">
-            <img 
-              src="/logo.png" 
-              alt="CyberEdu Logo" 
-              className="w-8 h-8 group-hover:scale-110 transition-transform duration-300"
-            />
-            <span className="text-xl font-bold bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">
-              CyberEdu
-            </span>
-          </a>
+          
+          {/* Left side: Logo + Navlinks */}
+          <div className="flex items-center">
+            {/* Logo in corner */}
+            <a href="/" className="flex items-center group">
+              <img 
+                src="/logo.png" 
+                alt="CyberEdu Logo" 
+                className="h-8 sm:h-10 md:h-11 w-auto object-contain group-hover:scale-110 transition-transform duration-300"
+              />
+            </a>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.path}
-                className="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors duration-300 group"
-              >
-                <span className="group-hover:scale-110 transition-transform duration-300">
-                  {item.icon}
-                </span>
-                <span className="font-medium">{item.name}</span>
-              </a>
-            ))}
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8 ml-6">
+              {navItems.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.path}
+                  className="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors duration-300 group"
+                >
+                  <span className="group-hover:scale-110 transition-transform duration-300">
+                    {item.icon}
+                  </span>
+                  <span className="font-medium">{item.name}</span>
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Search Bar */}
