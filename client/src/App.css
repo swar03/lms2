@@ -1,4 +1,18 @@
+/*
+  DELETE or comment out the entire #root rule.
+  Do NOT set max-width or margin here.
+*/
+/*
 #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+*/
+
+/* ADD this new class to control your main content area */
+.content-container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
