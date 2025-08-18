@@ -1,7 +1,5 @@
-/*
-  DELETE or comment out the entire #root rule.
-  Do NOT set max-width or margin here.
-*/
+
+/* Do NOT set max-width or margin here. */
 /*
 #root {
   max-width: 1280px;
@@ -15,19 +13,28 @@
 .content-container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 3rem; /* Increased padding from 2rem to 3rem */
   text-align: center;
+}
+
+/* Additional responsive padding for better mobile experience */
+@media (max-width: 768px) {
+  .content-container {
+    padding: 1.5rem;
+  }
 }
 
 .logo {
   height: 6em;
-  padding: 1.5em;
+  padding: 2em; /* Increased padding from 1.5em to 2em */
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -48,9 +55,41 @@
 }
 
 .card {
-  padding: 2em;
+  padding: 2.5em; /* Increased padding from 2em to 2.5em */
+  margin: 1rem 0; /* Added margin for better spacing between cards */
 }
 
 .read-the-docs {
   color: #888;
+  padding: 1rem 0; /* Added padding for better text spacing */
+}
+
+/* Additional utility classes for enhanced spacing */
+.section-padding {
+  padding: 2rem 0;
+}
+
+.component-padding {
+  padding: 1rem;
+}
+
+/* Enhanced button padding if you have buttons */
+button {
+  padding: 0.75rem 1.5rem;
+}
+
+/* Form elements padding enhancement */
+input, textarea, select {
+  padding: 0.75rem 1rem;
+}
+
+/* General content spacing improvements */
+p, h1, h2, h3, h4, h5, h6 {
+  padding: 0.5rem 0;
+}
+
+/* Container for better overall spacing */
+.wrapper {
+  padding: 1rem;
+  box-sizing: border-box;
 }

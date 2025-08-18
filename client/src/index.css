@@ -1,24 +1,28 @@
 @import "tailwindcss";
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
+  
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding: 1rem; /* Added padding to root */
 }
 
 a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
+  padding: 0.25rem 0.5rem; /* Added padding for better click area */
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -29,41 +33,176 @@ body {
   /* place-items: center;  <-- DELETE this line */
   min-width: 320px;
   min-height: 100vh;
+  padding: 1.5rem; /* Added body padding for overall spacing */
+}
+
+/* Main content container padding */
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Section spacing */
+.section {
+  padding: 3rem 0;
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  padding: 1rem 0; /* Added padding for better spacing */
+  margin: 0; /* Reset margin since we're using padding */
+}
+
+/* Enhanced heading spacing */
+h2, h3, h4, h5, h6 {
+  padding: 0.75rem 0;
+}
+
+/* Paragraph and text element padding */
+p {
+  padding: 0.5rem 0;
+}
+
+/* List padding improvements */
+ul, ol {
+  padding: 0.5rem 0 0.5rem 2rem;
+}
+
+li {
+  padding: 0.25rem 0;
 }
 
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 0.8em 1.5em; /* Increased padding from 0.6em 1.2em */
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  margin: 0.5rem 0; /* Added margin for button spacing */
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Form elements enhanced padding */
+input, textarea, select {
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin: 0.25rem 0;
+}
+
+/* Card-like containers */
+.card {
+  padding: 2rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Navigation spacing */
+nav {
+  padding: 1rem 2rem;
+}
+
+nav ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+nav li {
+  padding: 0.5rem 1rem;
+  display: inline-block;
+}
+
+/* Content spacing utilities */
+.content-spacing > * {
+  margin-bottom: 1rem;
+}
+
+.content-spacing > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive padding adjustments */
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+  
+  .container {
+    padding: 1rem;
+  }
+  
+  .section {
+    padding: 2rem 0;
+  }
+  
+  h1 {
+    padding: 0.75rem 0;
+  }
+  
+  button {
+    padding: 0.7em 1.3em;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+  
+  nav {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 0.75rem;
+  }
+  
+  .container {
+    padding: 0.75rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
+    padding: 1rem; /* Maintained padding in light mode */
   }
+  
   a:hover {
     color: #747bff;
   }
+  
   button {
     background-color: #f9f9f9;
+  }
+  
+  .card {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  input, textarea, select {
+    border-color: #ddd;
+    background-color: #fff;
   }
 }
