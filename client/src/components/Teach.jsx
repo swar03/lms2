@@ -17,8 +17,11 @@ import {
   Star,
   TrendingUp
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Teach() {
+  const navigate = useNavigate();
+
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -88,30 +91,40 @@ export default function Teach() {
       if (isLogin) {
         if (email && password) {
           setSuccess("Instructor login successful! Welcome back.");
+          setLoading(false);
+          // Redirect on successful login after short delay to show success message
+          setTimeout(() => {
+            navigate("/instructor-portal");
+          }, 700);
         } else {
           setError("Please fill in all fields.");
+          setLoading(false);
         }
       } else {
         if (name && email && password) {
           setSuccess("Instructor application submitted! We'll review your profile and get back to you within 24 hours.");
-          setIsLogin(true);
+          setLoading(false);
+          // Switch to login mode after apply and optionally redirect after a delay
+          setTimeout(() => {
+            setIsLogin(true);
+          }, 1000);
         } else {
           setError("Please fill in all required fields.");
+          setLoading(false);
         }
       }
-      setLoading(false);
     }, 1500);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 relative">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237C3AED' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }}></div>
       </div>
-      
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -225,8 +238,8 @@ export default function Teach() {
                 {isLogin ? "Instructor Portal" : "Become an Instructor"}
               </h2>
               <p className="text-slate-300">
-                {isLogin 
-                  ? "Sign in to access your instructor dashboard" 
+                {isLogin
+                  ? "Sign in to access your instructor dashboard"
                   : "Join our community of expert instructors"
                 }
               </p>
@@ -239,7 +252,7 @@ export default function Teach() {
                 <p className="text-red-300 text-sm">{error}</p>
               </div>
             )}
-            
+
             {success && (
               <div className="mb-6 p-4 bg-green-500/20 border border-green-500/30 rounded-xl flex items-center space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
@@ -248,7 +261,7 @@ export default function Teach() {
             )}
 
             {/* Form */}
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {!isLogin && (
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -334,7 +347,7 @@ export default function Teach() {
                   </>
                 )}
               </button>
-            </div>
+            </form>
 
             {/* Toggle Login/Register */}
             <div className="mt-8 text-center">

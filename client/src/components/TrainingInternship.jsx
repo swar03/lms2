@@ -2,21 +2,21 @@ import React, { useState } from "react";
 import { 
   GraduationCap, 
   Building, 
-  Clock, 
-  Users, 
-  CheckCircle, 
-  Star, 
-  Award, 
   Briefcase,
   TrendingUp,
   ArrowRight,
-  Calendar,
+  DollarSign,
+  Users,
+  Award,
   MapPin,
-  DollarSign
+  Star,
+  CheckCircle
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function TrainingInternship() {
   const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
 
   const programHighlights = [
     {
@@ -41,45 +41,6 @@ export default function TrainingInternship() {
     }
   ];
 
-  const curriculum = [
-    {
-      phase: "Phase 1: Foundations (Weeks 1-4)",
-      topics: [
-        "Cybersecurity Fundamentals",
-        "Network Security Basics", 
-        "Operating Systems Security",
-        "Cryptography Essentials"
-      ]
-    },
-    {
-      phase: "Phase 2: Practical Skills (Weeks 5-8)",
-      topics: [
-        "Ethical Hacking & Penetration Testing",
-        "Vulnerability Assessment",
-        "Incident Response",
-        "Digital Forensics"
-      ]
-    },
-    {
-      phase: "Phase 3: Specialization (Weeks 9-12)",
-      topics: [
-        "Cloud Security",
-        "Application Security", 
-        "Security Architecture",
-        "Compliance & Governance"
-      ]
-    },
-    {
-      phase: "Phase 4: Internship (6 Months)",
-      topics: [
-        "Real-world Project Experience",
-        "Industry Mentorship",
-        "Professional Development",
-        "Certification Preparation"
-      ]
-    }
-  ];
-
   const partnerCompanies = [
     { name: "CyberTech Solutions", positions: "5 openings", salary: "₹8-12 LPA" },
     { name: "SecureNet Corp", positions: "3 openings", salary: "₹10-15 LPA" },
@@ -87,22 +48,20 @@ export default function TrainingInternship() {
     { name: "TechGuard Industries", positions: "4 openings", salary: "₹11-16 LPA" }
   ];
 
-const testimonials = [
-  {
-    name: "Riya Birnale",
-    role: "Full Stack Developer at Cyber Secured India",
-    image: "https://i.postimg.cc/mhnWZyyP/logo2.jpg",
-    quote: "This program transformed my career. The combination of training and internship gave me real-world experience."
-  },
-  {
-    name: "Rahul Patel", 
-    role: "Penetration Tester at SecureNet",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    quote: "The hands-on approach and industry connections made all the difference in landing my dream job."
-  }
-];
-
-
+  const testimonials = [
+    {
+      name: "Priya Sharma",
+      role: "Security Analyst at CyberTech",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+      quote: "This program transformed my career. The combination of training and internship gave me real-world experience."
+    },
+    {
+      name: "Rahul Patel", 
+      role: "Penetration Tester at SecureNet",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      quote: "The hands-on approach and industry connections made all the difference in landing my dream job."
+    }
+  ];
 
   const handleEnrollClick = () => {
     alert("Enrolling in Training + Internship program");
@@ -110,6 +69,14 @@ const testimonials = [
 
   const handleBrochureClick = () => {
     alert("Downloading brochure...");
+  };
+
+  const handleTabClick = (tab) => {
+    if (tab === 'curriculum') {
+      navigate("/curriculum");
+    } else {
+      setActiveTab(tab);
+    }
   };
 
   return (
@@ -167,7 +134,7 @@ const testimonials = [
             {['overview', 'curriculum', 'internship', 'testimonials'].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => handleTabClick(tab)}
                 className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
                   activeTab === tab
                     ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
@@ -248,26 +215,6 @@ const testimonials = [
                 </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {activeTab === 'curriculum' && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-white text-center mb-12">Comprehensive Curriculum</h2>
-            
-            {curriculum.map((phase, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">{phase.phase}</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {phase.topics.map((topic, topicIndex) => (
-                    <div key={topicIndex} className="flex items-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span className="text-slate-300">{topic}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
           </div>
         )}
 
