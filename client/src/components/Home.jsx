@@ -104,7 +104,7 @@ export default function Home() {
               </button>
               
               <button 
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:shadow-xl"
+                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-black font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:shadow-xl"
                 onClick={() => alert('Playing demo video!')}
               >
                 Watch Demo
@@ -182,7 +182,7 @@ export default function Home() {
                 </div>
 
                 <button 
-                  className="w-full py-3 bg-white/10 text-white font-medium rounded-xl hover:bg-white/20 transition-all duration-300 group-hover:transform group-hover:translate-y-[-2px]"
+                  className="w-full py-3 bg-white/10 text-black font-medium rounded-xl hover:bg-white/20 transition-all duration-300 group-hover:transform group-hover:translate-y-[-2px]"
                   onClick={() => alert(`Exploring ${track.title} track!`)}
                 >
                   Explore Track

@@ -138,7 +138,7 @@ export default function TrainingInternship() {
                 className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
                   activeTab === tab
                     ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
-                    : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    : 'text-grey-900 hover:text-black hover:bg-white/10'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -320,7 +320,7 @@ export default function TrainingInternship() {
               </button>
               
               <button 
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-black font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
                 onClick={handleBrochureClick}
               >
                 Download Brochure
