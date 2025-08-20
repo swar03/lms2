@@ -1,15 +1,8 @@
 import React, { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
-  Mail, 
-  Lock, 
-  User, 
-  Phone, 
-  Eye, 
-  EyeOff, 
-  Shield, 
-  ArrowRight,
-  CheckCircle,
-  AlertCircle
+  Mail, Lock, User, Phone, Eye, EyeOff, Shield, ArrowRight,
+  CheckCircle, AlertCircle 
 } from "lucide-react";
 
 const LoginRegister = () => {
@@ -26,6 +19,7 @@ const LoginRegister = () => {
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const countryCodes = [
     { name: "India", code: "+91" },
@@ -35,26 +29,12 @@ const LoginRegister = () => {
     { name: "Australia", code: "+61" }
   ];
 
-  const validateEmail = useCallback((email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }, []);
-
-  const validatePassword = useCallback((password) => {
-    return password.length >= 6;
-  }, []);
-
-  const validatePhone = useCallback((phone) => {
-    const phoneRegex = /^[0-9]{6,15}$/;
-    return phoneRegex.test(phone);
-  }, []);
+  const validateEmail = useCallback(email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), []);
+  const validatePassword = useCallback(password => password.length >= 6, []);
+  const validatePhone = useCallback(phone => /^[0-9]{6,15}$/.test(phone), []);
 
   const handleInputChange = useCallback((field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    // Clear errors when user starts typing
+    setFormData(prev => ({ ...prev, [field]: value }));
     if (error) setError("");
   }, [error]);
 
@@ -79,52 +59,36 @@ const LoginRegister = () => {
     setLoading(true);
 
     try {
-      // Validation
-      if (!formData.email || !formData.password) {
+      if (!formData.email || !formData.password)
         throw new Error("Please fill in all required fields.");
-      }
 
-      if (!validateEmail(formData.email)) {
+      if (!validateEmail(formData.email))
         throw new Error("Please enter a valid email address.");
-      }
 
-      if (!validatePassword(formData.password)) {
+      if (!validatePassword(formData.password))
         throw new Error("Password must be at least 6 characters long.");
-      }
 
       if (!isLogin) {
-        if (!formData.name.trim()) {
+        if (!formData.name.trim())
           throw new Error("Please enter your full name.");
-        }
-
-        if (!formData.phoneNumber || !validatePhone(formData.phoneNumber)) {
+        if (!formData.phoneNumber || !validatePhone(formData.phoneNumber))
           throw new Error("Please enter a valid phone number (6-15 digits).");
-        }
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1200)); // Simulate API
 
-      if (isLogin) {
-        setSuccess("Login successful! Redirecting...");
-        // Navigate to dashboard after success
-        setTimeout(() => {
-          // window.location.href = "/dashboard";
-          console.log("Redirecting to dashboard...");
-        }, 1000);
-      } else {
-        setSuccess("Account created successfully! You can now log in.");
-        setTimeout(() => {
-          setIsLogin(true);
-          resetForm();
-        }, 1000);
-      }
+      // **Always redirect to onboarding survey after success**
+      setSuccess(isLogin ? "Login successful! Redirecting..." : "Account created! Redirecting...");
+      setTimeout(() => {
+        navigate("/survey");
+      }, 1000);
+
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [formData, isLogin, validateEmail, validatePassword, validatePhone, resetForm]);
+  }, [formData, isLogin, validateEmail, validatePassword, validatePhone, resetForm, navigate]);
 
   const handleToggleMode = useCallback(() => {
     setIsLogin(prev => !prev);
@@ -132,7 +96,6 @@ const LoginRegister = () => {
   }, [resetForm]);
 
   const handleForgotPassword = useCallback(() => {
-    // Replace with actual forgot password logic
     alert("Password reset functionality would be implemented here");
   }, []);
 
@@ -147,11 +110,8 @@ const LoginRegister = () => {
           }}
         />
       </div>
-      
       <div className="relative w-full max-w-md">
-        {/* Main Card */}
         <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8">
-          {/* Logo and Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-4">
               <Shield className="w-8 h-8 text-white" />
@@ -160,28 +120,25 @@ const LoginRegister = () => {
               {isLogin ? "Welcome Back!" : "Join CyberEdu"}
             </h2>
             <p className="text-slate-300">
-              {isLogin 
-                ? "Sign in to continue your cybersecurity journey" 
+              {isLogin
+                ? "Sign in to continue your cybersecurity journey"
                 : "Start your cybersecurity education today"
               }
             </p>
           </div>
-
-          {/* Error/Success Messages */}
+          {/* Error/Success */}
           {error && (
             <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center space-x-3">
               <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
               <p className="text-red-300 text-sm">{error}</p>
             </div>
           )}
-          
           {success && (
             <div className="mb-6 p-4 bg-green-500/20 border border-green-500/30 rounded-xl flex items-center space-x-3">
               <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
               <p className="text-green-300 text-sm">{success}</p>
             </div>
           )}
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             {!isLogin && (
@@ -200,14 +157,13 @@ const LoginRegister = () => {
                       name="name"
                       type="text"
                       value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onChange={e => handleInputChange('name', e.target.value)}
                       className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                       placeholder="Enter your full name"
                       autoComplete="name"
                     />
                   </div>
                 </div>
-
                 {/* Profile Type */}
                 <div>
                   <label htmlFor="profileType" className="block text-sm font-medium text-slate-300 mb-2">
@@ -217,7 +173,7 @@ const LoginRegister = () => {
                     id="profileType"
                     name="profileType"
                     value={formData.profileType}
-                    onChange={(e) => handleInputChange('profileType', e.target.value)}
+                    onChange={e => handleInputChange('profileType', e.target.value)}
                     className="w-full p-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   >
                     <option value="STUDENT" className="bg-slate-800">Student</option>
@@ -227,7 +183,6 @@ const LoginRegister = () => {
                 </div>
               </>
             )}
-
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
@@ -242,14 +197,13 @@ const LoginRegister = () => {
                   name="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={e => handleInputChange('email', e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   placeholder="Enter your email"
                   autoComplete="email"
                 />
               </div>
             </div>
-
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
@@ -264,7 +218,7 @@ const LoginRegister = () => {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  onChange={e => handleInputChange('password', e.target.value)}
                   className="w-full pl-10 pr-12 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   placeholder="Enter your password"
                   autoComplete={isLogin ? "current-password" : "new-password"}
@@ -283,9 +237,8 @@ const LoginRegister = () => {
                 </button>
               </div>
             </div>
-
+            {/* Phone (Sign Up only) */}
             {!isLogin && (
-              /* Phone Number */
               <div>
                 <label htmlFor="phoneNumber" className="block text-sm font-medium text-slate-300 mb-2">
                   Phone Number *
@@ -293,7 +246,7 @@ const LoginRegister = () => {
                 <div className="flex space-x-3">
                   <select
                     value={formData.countryCode}
-                    onChange={(e) => handleInputChange('countryCode', e.target.value)}
+                    onChange={e => handleInputChange('countryCode', e.target.value)}
                     className="w-32 p-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     aria-label="Country code"
                   >
@@ -312,7 +265,7 @@ const LoginRegister = () => {
                       name="phoneNumber"
                       type="tel"
                       value={formData.phoneNumber}
-                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      onChange={e => handleInputChange('phoneNumber', e.target.value)}
                       className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                       placeholder="Phone number"
                       autoComplete="tel"
@@ -321,7 +274,6 @@ const LoginRegister = () => {
                 </div>
               </div>
             )}
-
             {/* Submit Button */}
             <button
               type="submit"
@@ -341,7 +293,6 @@ const LoginRegister = () => {
               )}
             </button>
           </form>
-
           {/* Toggle Login/Register */}
           <div className="mt-8 text-center">
             <p className="text-slate-300">
@@ -355,7 +306,6 @@ const LoginRegister = () => {
               </button>
             </p>
           </div>
-
           {/* Additional Links */}
           {isLogin && (
             <div className="mt-6 text-center">
@@ -369,7 +319,6 @@ const LoginRegister = () => {
             </div>
           )}
         </div>
-
         {/* Security Notice */}
         <div className="mt-6 text-center">
           <p className="text-xs text-slate-400">

@@ -7,9 +7,8 @@ import TrainingInternship from "./components/TrainingInternship";
 import Curriculum from "./components/curriculum";
 import LoginRegister from "./components/LoginRegister";
 import Teach from "./components/Teach";
-import InstructorPortal from "./components/instructorportal"; 
-// <- new import
-
+import InstructorPortal from "./components/instructorportal";
+import OnboardingSurvey from "./components/OnboardingSurvey";
 
 import './App.css';
 
@@ -25,7 +24,8 @@ export default function App() {
           <Route path="/training-internship" element={<TrainingInternship />} />
           <Route path="/curriculum" element={<Curriculum />} />
           <Route path="/login" element={<LoginRegister />} />
-          <Route path="/instructor-portal" element={<InstructorPortal />} /> {/* New route */}
+          <Route path="/instructor-portal" element={<InstructorPortal />} />
+          <Route path="/survey" element={<OnboardingSurvey />} />
         </Routes>
       </main>
     </Router>
