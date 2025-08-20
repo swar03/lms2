@@ -1,16 +1,16 @@
-version: '3.8'
 services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: lms_user
+      POSTGRES_PASSWORD: lms_password
       POSTGRES_DB: lms_database
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # This line will automatically run your schema script on first launch
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/init.sql
+      # Add this line to run your new init script
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
 volumes:
   postgres_data:
