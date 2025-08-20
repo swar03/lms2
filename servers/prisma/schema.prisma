@@ -55,22 +55,28 @@ enum EnrollmentStatus {
   SUSPENDED
 }
 
-// User model (Students, Educators, Admins)
+// User model (supports both Google OAuth and Manual login)
 model User {
-  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  googleId          String   @unique @map("google_id") @db.VarChar(100)
-  email             String   @unique @db.VarChar(255)
-  name              String   @db.VarChar(100)
-  profilePicture    String?  @map("profile_picture")
-  role              UserRole @default(STUDENT)
-  isActive          Boolean  @default(true) @map("is_active")
-  emailVerified     Boolean  @default(false) @map("email_verified")
-  surveyCompleted   Boolean  @default(false) @map("survey_completed")
-  lastLogin         DateTime? @map("last_login") @db.Timestamptz(6)
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name           String   @db.VarChar(100)
+  email          String   @unique @db.VarChar(255)
+  password       String?  // For manual sign-up
+  role           UserRole @default(STUDENT)
+  countryCode    String?  // For manual sign-up
+  phoneNumber    String?  // For manual sign-up
 
-  // Relationships
+  // Google OAuth specific fields
+  googleId       String?  @unique @map("google_id") @db.VarChar(100)
+  profilePicture String?  @map("profile_picture")
+
+  // Common fields
+  isActive       Boolean  @default(true) @map("is_active")
+  surveyCompleted Boolean  @default(false) @map("survey_completed")
+  lastLogin      DateTime? @map("last_login") @db.Timestamptz(6)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relationships (no changes here)
   surveyResponses       SurveyResponse[]
   coursesAsInstructor   Course[]               @relation("CourseInstructor")
   courseEnrollments     CourseEnrollment[]
