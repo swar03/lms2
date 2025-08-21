@@ -488,7 +488,7 @@ export default function InstructorDashboard() {
                     <div className="lg:hidden"></div> {/* Spacer to center the profile on mobile */}
                     <div className="hidden lg:block"></div> {/* Spacer for desktop */}
                     <div className="flex items-center gap-3">
-                        <span className="font-medium text-slate-700 hidden sm:inline">Hi! Heer Patel</span>
+                        <span className="font-medium text-slate-700 hidden sm:inline">Hi! Riya Devansh Aage</span>
                         <div className="w-9 h-9 bg-slate-200 rounded-full"></div>
                     </div>
                 </header>
