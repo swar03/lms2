@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import adminAuthMiddleware from './middleware/adminAuth.js';
 
 // Import Google Auth routes as well
 import authRoutes from './routes/auth.js';
@@ -65,6 +66,40 @@ app.post('/api/login', async (req, res) => {
     res.json({ message: 'Login successful!', token });
   } catch (error) {
     console.error('Login error:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+app.patch('/api/users/:userId/role', adminAuthMiddleware, async (req, res) => {
+  const { userId } = req.params;
+  const { role } = req.body;
+
+  // Validate the new role
+  if (!role || !['STUDENT', 'EDUCATOR', 'ADMIN'].includes(role)) {
+    return res.status(400).json({ message: 'Invalid role specified.' });
+  }
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { role: role },
+    });
+
+    res.status(200).json({
+      message: `User role updated to ${role} successfully.`,
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      },
+    });
+  } catch (error) {
+    // P2025 is Prisma's error code for "record not found"
+    if (error.code === 'P2025') {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    console.error('Role update error:', error);
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
