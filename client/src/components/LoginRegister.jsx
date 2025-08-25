@@ -12,7 +12,6 @@ const LoginRegister = () => {
     name: "",
     email: "",
     password: "",
-    profileType: "STUDENT",
     countryCode: "+91",
     phoneNumber: ""
   });
@@ -26,8 +25,7 @@ const LoginRegister = () => {
     { name: "India", code: "+91" },
     { name: "United States", code: "+1" },
     { name: "United Kingdom", code: "+44" },
-    { name: "Canada", code: "+1" },
-    { name: "Australia", code: "+61" }
+    // Add other codes as needed
   ];
 
   const validateEmail = useCallback(email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), []);
@@ -44,7 +42,6 @@ const LoginRegister = () => {
       name: "",
       email: "",
       password: "",
-      profileType: "STUDENT",
       countryCode: "+91",
       phoneNumber: ""
     });
@@ -84,13 +81,15 @@ const LoginRegister = () => {
         });
         setSuccess("Login successful! Redirecting...");
       } else {
+        // --- CHANGE: The 'role' is no longer sent from the form. ---
+        // It will be handled by the backend's default value.
         response = await api.post('/register', {
           fullName: formData.name,
           email: formData.email,
           password: formData.password,
-          role: formData.profileType,
           countryCode: formData.countryCode,
           phoneNumber: formData.phoneNumber
+          // 'role' is intentionally omitted here
         });
         setSuccess("Account created! Redirecting...");
       }
@@ -180,22 +179,7 @@ const LoginRegister = () => {
                     />
                   </div>
                 </div>
-                <div>
-                  <label htmlFor="profileType" className="block text-sm font-medium text-slate-300 mb-2">
-                    I am a... *
-                  </label>
-                  <select
-                    id="profileType"
-                    name="profileType"
-                    value={formData.profileType}
-                    onChange={e => handleInputChange('profileType', e.target.value)}
-                    className="w-full p-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                  >
-                    <option value="STUDENT" className="bg-slate-800">Student</option>
-                    <option value="TEACHER" className="bg-slate-800">Teacher</option>
-                    <option value="JOB_PROFESSIONAL" className="bg-slate-800">Job Professional</option>
-                  </select>
-                </div>
+                {/* --- CHANGE: "I am a..." dropdown is now removed --- */}
               </>
             )}
             <div>

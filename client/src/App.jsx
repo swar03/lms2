@@ -9,6 +9,10 @@ import LoginRegister from "./components/LoginRegister";
 import Teach from "./components/Teach";
 import InstructorPortal from "./components/instructorportal";
 import OnboardingSurvey from "./components/OnboardingSurvey";
+import MyLearnings from "./components/MyLearnings"; // <-- Imported new component MyLearnings
+
+
+
 
 import './App.css';
 
@@ -26,6 +30,7 @@ export default function App() {
           <Route path="/login" element={<LoginRegister />} />
           <Route path="/instructor-portal" element={<InstructorPortal />} />
           <Route path="/survey" element={<OnboardingSurvey />} />
+          <Route path="/my-learnings" element={<MyLearnings />} /> {/* <-- Added new route for MyLearnings */}
         </Routes>
       </main>
     </Router>

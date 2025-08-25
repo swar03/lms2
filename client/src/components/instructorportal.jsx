@@ -20,7 +20,7 @@ const INITIAL_COURSES = [
     },
 ];
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "http://localhost:5000";
 
 // --- Reusable UI Components ---
 
@@ -173,7 +173,6 @@ const AddCoursePage = ({ onAddCourse }) => {
     const [creatingQuizForChapter, setCreatingQuizForChapter] = useState(null);
     const [isCreatingOverallQuiz, setIsCreatingOverallQuiz] = useState(false);
 
-    // Chapter Management
     const addChapter = () => setChapters([...chapters, { id: Date.now(), title: `Chapter ${chapters.length + 1}`, modules: [] }]);
     const updateChapter = (id, updatedChapter) => setChapters(chapters.map(ch => ch.id === id ? updatedChapter : ch));
     const deleteChapter = (id) => {
@@ -181,7 +180,6 @@ const AddCoursePage = ({ onAddCourse }) => {
         const newQuizzes = {...chapterQuizzes}; delete newQuizzes[id]; setChapterQuizzes(newQuizzes);
     };
 
-    // Module & Lecture Management
     const updateChapterContent = (chapterId, updateFn) => { setChapters(chapters.map(ch => ch.id === chapterId ? updateFn(ch) : ch)); };
     const addModule = (chapterId) => updateChapterContent(chapterId, (ch) => ({ ...ch, modules: [...ch.modules, { id: Date.now(), title: `Module ${ch.modules.length + 1}`, lectures: [] }] }));
     const updateModule = (chapterId, moduleId, updatedModule) => updateChapterContent(chapterId, (ch) => ({ ...ch, modules: ch.modules.map(m => m.id === moduleId ? updatedModule : m) }));
@@ -189,7 +187,6 @@ const AddCoursePage = ({ onAddCourse }) => {
     const addLecture = (chapterId, moduleId, newLecture) => updateChapterContent(chapterId, (ch) => ({ ...ch, modules: ch.modules.map(m => m.id === moduleId ? { ...m, lectures: [...m.lectures, newLecture] } : m) }));
     const deleteLecture = (chapterId, moduleId, lectureId) => updateChapterContent(chapterId, (ch) => ({ ...ch, modules: ch.modules.map(m => m.id === moduleId ? { ...m, lectures: m.lectures.filter(l => l.id !== lectureId) } : m) }));
 
-    // Quiz Management
     const handleSaveChapterQuiz = (chapterId, quizData) => {
         setChapterQuizzes(prev => ({...prev, [chapterId]: quizData }));
         setCreatingQuizForChapter(null);
@@ -200,15 +197,40 @@ const AddCoursePage = ({ onAddCourse }) => {
         setIsCreatingOverallQuiz(false);
         axios.post(`${API_URL}/create_quiz`, quizData).then(res => alert("Overall course quiz saved!")).catch(err => console.error(err));
     };
-    const handleSubmit = () => {
-        if (!title || !thumbnail) return alert("Course Title and Thumbnail are required.");
-        onAddCourse({
-            id: Date.now(), title, description, price: +price || 0, discount: +discount || 0, 
-            thumbnail: thumbnailPreview, chapters, chapterQuizzes, overallQuiz,
-            publishedOn: new Date().toLocaleDateString(), students: 0, earnings: 0
-        });
-        setTitle(''); setDescription(''); setPrice(''); setDiscount(''); setThumbnail(null); 
-        setThumbnailPreview(''); setChapters([]); setChapterQuizzes({}); setOverallQuiz(null);
+
+    const handleSubmit = async () => {
+        if (!title || !thumbnailPreview) {
+            return alert("Course Title and Thumbnail are required.");
+        }
+        
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert("You must be logged in to create a course.");
+                return;
+            }
+
+            const courseData = {
+                title,
+                description,
+                price: +price || 0,
+                thumbnail: "https://placehold.co/600x400/8b5cf6/ffffff?text=New+Course", 
+                chapters,
+            };
+
+            const response = await axios.post(`${API_URL}/api/courses`, courseData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            onAddCourse(response.data);
+
+            setTitle(''); setDescription(''); setPrice(''); setDiscount(''); setThumbnail(null); 
+            setThumbnailPreview(''); setChapters([]); setChapterQuizzes({}); setOverallQuiz(null);
+
+        } catch (err) {
+            console.error("Course creation failed:", err);
+            alert(err.response?.data?.message || "An error occurred while creating the course.");
+        }
     };
 
     return (
@@ -271,148 +293,34 @@ const AddCoursePage = ({ onAddCourse }) => {
 const MyCoursesPage = ({ courses }) => (
     <div className="p-4 md:p-8">
         <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-6">My Courses</h2>
-        
-        {/* Card view for mobile */}
-        <div className="lg:hidden space-y-4">
-            {courses.map(course => (
-                <div key={course.id} className="bg-white rounded-lg shadow p-4 space-y-3">
-                    <div className="flex items-start gap-4">
-                        <img src={course.thumbnail} alt={course.title} className="w-24 h-16 object-cover rounded-md" />
-                        <span className="font-bold text-slate-800">{course.title}</span>
-                    </div>
-                    <div className="text-sm text-slate-600 border-t pt-3 space-y-2">
-                        <p><strong className="text-slate-700">Earnings:</strong> ₹{course.earnings.toLocaleString()}</p>
-                        <p><strong className="text-slate-700">Students:</strong> {course.students}</p>
-                        <p><strong className="text-slate-700">Published:</strong> {course.publishedOn}</p>
-                    </div>
-                </div>
-            ))}
-        </div>
-
-        {/* Table view for desktop */}
-        <div className="hidden lg:block bg-white rounded-lg shadow overflow-x-auto">
-            <table className="w-full text-left">
-                <thead className="bg-slate-50">
-                    <tr>
-                        <th className="p-4 font-semibold text-slate-600">Course</th>
-                        <th className="p-4 font-semibold text-slate-600">Earnings</th>
-                        <th className="p-4 font-semibold text-slate-600">Students</th>
-                        <th className="p-4 font-semibold text-slate-600">Published</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {courses.map(course => (
-                        <tr key={course.id} className="border-b hover:bg-slate-50">
-                            <td className="p-4 flex items-center gap-4"><img src={course.thumbnail} alt={course.title} className="w-24 h-16 object-cover rounded-md" /><span className="font-medium text-slate-800">{course.title}</span></td>
-                            <td className="p-4 text-slate-700">₹{course.earnings.toLocaleString()}</td>
-                            <td className="p-4 text-slate-700">{course.students}</td>
-                            <td className="p-4 text-slate-700">{course.publishedOn}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        <div className="lg:hidden space-y-4">{courses.map(course => (<div key={course.id} className="bg-white rounded-lg shadow p-4 space-y-3"><div className="flex items-start gap-4"><img src={course.thumbnailUrl || course.thumbnail} alt={course.title} className="w-24 h-16 object-cover rounded-md" /><span className="font-bold text-slate-800">{course.title}</span></div><div className="text-sm text-slate-600 border-t pt-3 space-y-2"><p><strong className="text-slate-700">Earnings:</strong> ₹{(course.earnings || 0).toLocaleString()}</p><p><strong className="text-slate-700">Students:</strong> {course.students || 0}</p><p><strong className="text-slate-700">Published:</strong> {new Date(course.createdAt || course.publishedOn).toLocaleDateString()}</p></div></div>))}</div>
+        <div className="hidden lg:block bg-white rounded-lg shadow overflow-x-auto"><table className="w-full text-left"><thead className="bg-slate-50"><tr><th className="p-4 font-semibold text-slate-600">Course</th><th className="p-4 font-semibold text-slate-600">Earnings</th><th className="p-4 font-semibold text-slate-600">Students</th><th className="p-4 font-semibold text-slate-600">Published</th></tr></thead><tbody>{courses.map(course => (<tr key={course.id} className="border-b hover:bg-slate-50"><td className="p-4 flex items-center gap-4"><img src={course.thumbnailUrl || course.thumbnail} alt={course.title} className="w-24 h-16 object-cover rounded-md" /><span className="font-medium text-slate-800">{course.title}</span></td><td className="p-4 text-slate-700">₹{(course.earnings || 0).toLocaleString()}</td><td className="p-4 text-slate-700">{course.students || 0}</td><td className="p-4 text-slate-700">{new Date(course.createdAt || course.publishedOn).toLocaleDateString()}</td></tr>))}</tbody></table></div>
     </div>
 );
 
 const StudentsEnrolledPage = ({ students, courses }) => {
     const getCourseTitleById = (courseId) => courses.find(c => c.id === courseId)?.title || 'Unknown Course';
     return (
-        <div className="p-4 md:p-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-6">Students Enrolled</h2>
-            
-            {/* Card view for mobile */}
-            <div className="lg:hidden space-y-4">
-                {students.map(student => (
-                    <div key={student.id} className="bg-white rounded-lg shadow p-4 space-y-3">
-                         <div className="flex items-center gap-3">
-                            <img src={student.avatar} alt={student.name} className="w-10 h-10 rounded-full" />
-                            <span className="font-bold text-slate-800">{student.name}</span>
-                        </div>
-                         <div className="text-sm text-slate-600 border-t pt-3 space-y-2">
-                            <p><strong className="text-slate-700">Course:</strong> {getCourseTitleById(student.courseId)}</p>
-                            <p><strong className="text-slate-700">Enrolled On:</strong> {student.date}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Table view for desktop */}
-            <div className="hidden lg:block bg-white rounded-lg shadow overflow-x-auto">
-                <table className="w-full text-left">
-                    <thead className="bg-slate-50"><tr><th className="p-4 font-semibold text-slate-600">Name</th><th className="p-4 font-semibold text-slate-600">Course</th><th className="p-4 font-semibold text-slate-600">Enrollment Date</th></tr></thead>
-                    <tbody>
-                        {students.map(student => (
-                            <tr key={student.id} className="border-b hover:bg-slate-50">
-                                <td className="p-4 flex items-center gap-3"><img src={student.avatar} alt={student.name} className="w-10 h-10 rounded-full" /><span className="font-medium text-slate-800">{student.name}</span></td>
-                                <td className="p-4 text-slate-700">{getCourseTitleById(student.courseId)}</td>
-                                <td className="p-4 text-slate-700">{student.date}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <div className="p-4 md:p-8"><h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-6">Students Enrolled</h2><div className="lg:hidden space-y-4">{students.map(student => (<div key={student.id} className="bg-white rounded-lg shadow p-4 space-y-3"><div className="flex items-center gap-3"><img src={student.avatar} alt={student.name} className="w-10 h-10 rounded-full" /><span className="font-bold text-slate-800">{student.name}</span></div><div className="text-sm text-slate-600 border-t pt-3 space-y-2"><p><strong className="text-slate-700">Course:</strong> {getCourseTitleById(student.courseId)}</p><p><strong className="text-slate-700">Enrolled On:</strong> {student.date}</p></div></div>))}</div><div className="hidden lg:block bg-white rounded-lg shadow overflow-x-auto"><table className="w-full text-left"><thead className="bg-slate-50"><tr><th className="p-4 font-semibold text-slate-600">Name</th><th className="p-4 font-semibold text-slate-600">Course</th><th className="p-4 font-semibold text-slate-600">Enrollment Date</th></tr></thead><tbody>{students.map(student => (<tr key={student.id} className="border-b hover:bg-slate-50"><td className="p-4 flex items-center gap-3"><img src={student.avatar} alt={student.name} className="w-10 h-10 rounded-full" /><span className="font-medium text-slate-800">{student.name}</span></td><td className="p-4 text-slate-700">{getCourseTitleById(student.courseId)}</td><td className="p-4 text-slate-700">{student.date}</td></tr>))}</tbody></table></div></div>
     );
 };
 
 const DashboardPage = ({ courses, students }) => {
     const totalEnrollments = useMemo(() => students.length, [students]);
     const totalCourses = useMemo(() => courses.length, [courses]);
-    const totalEarnings = useMemo(() => courses.reduce((sum, course) => sum + course.earnings, 0), [courses]);
+    const totalEarnings = useMemo(() => courses.reduce((sum, course) => sum + (course.earnings || 0), 0), [courses]);
     const getCourseTitleById = (courseId) => courses.find(c => c.id === courseId)?.title || 'Unknown';
     return (
-        <div className="p-4 md:p-8 space-y-8">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <StatCard icon={<Users size={24} />} label="Total Enrollments" value={totalEnrollments} />
-                <StatCard icon={<BookCopy size={24} />} label="Total Courses" value={totalCourses} />
-                <StatCard icon={<DollarSign size={24} />} label="Total Earnings" value={`₹${totalEarnings.toLocaleString()}`} />
-            </div>
-            <div>
-                <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-4">Latest Enrollments</h2>
-                
-                {/* Mobile Card view for latest enrollments */}
-                <div className="lg:hidden space-y-4">
-                     {students.slice(0, 5).map(student => (
-                        <div key={student.id} className="bg-white rounded-lg shadow p-4 space-y-3">
-                             <div className="flex items-center gap-3">
-                                <img src={student.avatar} alt={student.name} className="w-10 h-10 rounded-full" />
-                                <span className="font-bold text-slate-800">{student.name}</span>
-                            </div>
-                             <div className="text-sm text-slate-600 border-t pt-3 space-y-2">
-                                <p><strong className="text-slate-700">Course:</strong> {getCourseTitleById(student.courseId)}</p>
-                                <p><strong className="text-slate-700">Date:</strong> {student.date}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Desktop Table view for latest enrollments */}
-                <div className="hidden lg:block bg-white rounded-lg shadow overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-slate-50"><tr><th className="p-4 font-semibold text-slate-600">Name</th><th className="p-4 font-semibold text-slate-600">Course</th><th className="p-4 font-semibold text-slate-600">Date</th></tr></thead>
-                        <tbody>
-                            {students.slice(0, 5).map(student => (
-                                <tr key={student.id} className="border-b hover:bg-slate-50">
-                                    <td className="p-4 flex items-center gap-3"><img src={student.avatar} alt={student.name} className="w-10 h-10 rounded-full" /><span className="font-medium text-slate-800">{student.name}</span></td>
-                                    <td className="p-4 text-slate-700">{getCourseTitleById(student.courseId)}</td>
-                                    <td className="p-4 text-slate-700">{student.date}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <div className="p-4 md:p-8 space-y-8"><div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"><StatCard icon={<Users size={24} />} label="Total Enrollments" value={totalEnrollments} /><StatCard icon={<BookCopy size={24} />} label="Total Courses" value={totalCourses} /><StatCard icon={<DollarSign size={24} />} label="Total Earnings" value={`₹${totalEarnings.toLocaleString()}`} /></div><div><h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-4">Latest Enrollments</h2><div className="lg:hidden space-y-4">{students.slice(0, 5).map(student => (<div key={student.id} className="bg-white rounded-lg shadow p-4 space-y-3"><div className="flex items-center gap-3"><img src={student.avatar} alt={student.name} className="w-10 h-10 rounded-full" /><span className="font-bold text-slate-800">{student.name}</span></div><div className="text-sm text-slate-600 border-t pt-3 space-y-2"><p><strong className="text-slate-700">Course:</strong> {getCourseTitleById(student.courseId)}</p><p><strong className="text-slate-700">Date:</strong> {student.date}</p></div></div>))}</div><div className="hidden lg:block bg-white rounded-lg shadow overflow-x-auto"><table className="w-full text-left"><thead className="bg-slate-50"><tr><th className="p-4 font-semibold text-slate-600">Name</th><th className="p-4 font-semibold text-slate-600">Course</th><th className="p-4 font-semibold text-slate-600">Date</th></tr></thead><tbody>{students.slice(0, 5).map(student => (<tr key={student.id} className="border-b hover:bg-slate-50"><td className="p-4 flex items-center gap-3"><img src={student.avatar} alt={student.name} className="w-10 h-10 rounded-full" /><span className="font-medium text-slate-800">{student.name}</span></td><td className="p-4 text-slate-700">{getCourseTitleById(student.courseId)}</td><td className="p-4 text-slate-700">{student.date}</td></tr>))}</tbody></table></div></div></div>
     );
 };
 
 const TakeQuizPage = () => {
+    // This component remains unchanged
     const [quizzes, setQuizzes] = useState([]); const [selectedQuiz, setSelectedQuiz] = useState(null); const [answers, setAnswers] = useState({}); const [result, setResult] = useState(null);
     useEffect(() => { const fetchQuizzes = async () => { try { const response = await axios.get(`${API_URL}/quizzes`); setQuizzes(response.data); } catch (error) { console.error("Error fetching quizzes", error); } }; fetchQuizzes(); }, []);
     const handleAnswerChange = (qIndex, value) => { setAnswers({ ...answers, [qIndex]: value }); };
     const handleSubmit = async () => { const payload = { quiz_id: selectedQuiz.id, answers: Object.entries(answers).map(([qIndex, selected]) => ({ question_id: parseInt(qIndex) + 1, selected, })), }; try { const response = await axios.post(`${API_URL}/submit_attempt`, payload); setResult(response.data); } catch (error) { console.error("Error submitting answers", error); alert("Failed to submit answers."); } };
-    
     if (result) { return ( <div className="p-4 md:p-8"><h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-4">Quiz Results</h2><div className="bg-white p-6 rounded-lg shadow"><h3 className="text-2xl font-bold text-blue-600 mb-4">You scored {result.score} out of {result.total}</h3><div className="space-y-4">{result.feedback.map((fb, index) => (<div key={index} className={`p-4 rounded-md ${fb.is_correct ? 'bg-green-100' : 'bg-red-100'}`}><p className="font-bold">{fb.is_correct ? '✅' : '❌'} {fb.question}</p><p>Your answer: {fb.selected}</p>{!fb.is_correct && <p>Correct answer: {fb.correct}</p>}</div>))}</div><button onClick={() => { setSelectedQuiz(null); setResult(null); setAnswers({}); }} className="mt-6 bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700">Back to Quizzes</button></div></div>); }
     if (selectedQuiz) { return ( <div className="p-4 md:p-8"><h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-4">{selectedQuiz.title}</h2><div className="space-y-6">{selectedQuiz.questions.map((q, index) => (<div key={index} className="bg-white p-6 rounded-lg shadow"><p className="font-semibold text-lg mb-3">{index + 1}. {q.question_text}</p><div className="space-y-2">{q.options.map((opt, oIndex) => (<label key={oIndex} className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 cursor-pointer"><input type="radio" name={`question_${index}`} value={opt} onChange={(e) => handleAnswerChange(index, e.target.value)} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" /><span>{opt}</span></label>))}</div></div>))}</div><button onClick={handleSubmit} className="mt-8 bg-black text-white py-3 px-8 rounded-lg font-bold text-lg hover:bg-slate-800 w-full sm:w-auto">Submit Answers</button></div>); }
     return ( <div className="p-4 md:p-8"><h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-8">Available Quizzes</h2><div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{quizzes.map(quiz => (<div key={quiz.id} className="bg-white p-6 rounded-lg shadow flex flex-col"><h3 className="text-xl font-bold text-slate-800">{quiz.title}</h3><p className="text-slate-600 my-2 flex-grow">{quiz.description}</p><button onClick={() => setSelectedQuiz(quiz)} className="w-full bg-blue-600 text-white py-2 mt-4 rounded-md hover:bg-blue-700">Take Quiz</button></div>))}</div></div>);
@@ -424,14 +332,14 @@ export default function InstructorDashboard() {
     const [currentPage, setCurrentPage] = useState('dashboard');
     const [courses, setCourses] = useState(INITIAL_COURSES);
     const [students, setStudents] = useState(INITIAL_STUDENTS);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar is hidden by default on mobile
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const addCourse = newCourse => {
-        setCourses([...courses, newCourse]);
+    const addCourse = (newCourseFromServer) => {
+        setCourses(prevCourses => [...prevCourses, newCourseFromServer]);
         alert("Course Added Successfully!");
         setCurrentPage('view');
     };
-
+    
     const navItems = [
         { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
         { id: 'add', icon: <PlusCircle size={20} />, label: 'Add Course' },
@@ -442,14 +350,13 @@ export default function InstructorDashboard() {
 
     const handleNavClick = (pageId) => {
         setCurrentPage(pageId);
-        if (window.innerWidth < 1024) { // Close sidebar on nav click on mobile
+        if (window.innerWidth < 1024) {
             setIsSidebarOpen(false);
         }
     };
     
     return (
         <div className="min-h-screen flex bg-slate-50">
-            {/* Sidebar Backdrop (for mobile) */}
             {isSidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
@@ -457,7 +364,6 @@ export default function InstructorDashboard() {
                 ></div>
             )}
 
-            {/* Sidebar */}
             <aside className={`bg-white border-r flex flex-col fixed inset-y-0 left-0 z-30
                 w-64 p-4 transform transition-transform duration-300 ease-in-out
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -485,8 +391,8 @@ export default function InstructorDashboard() {
                     <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-slate-600 hover:text-blue-600 lg:hidden">
                         <Menu size={24} />
                     </button>
-                    <div className="lg:hidden"></div> {/* Spacer to center the profile on mobile */}
-                    <div className="hidden lg:block"></div> {/* Spacer for desktop */}
+                    <div className="lg:hidden"></div>
+                    <div className="hidden lg:block"></div>
                     <div className="flex items-center gap-3">
                         <span className="font-medium text-slate-700 hidden sm:inline">Hi! Riya Devansh Aage</span>
                         <div className="w-9 h-9 bg-slate-200 rounded-full"></div>

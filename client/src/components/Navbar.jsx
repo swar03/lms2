@@ -15,9 +15,14 @@ export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navItems = [
+    // client/src/components/Navbar.jsx (Addition)
+
+// ... inside the navItems array
+    
     { name: "Home", icon: <Home size={18} />, path: "/" },
     { name: "Training", icon: <BookOpen size={18} />, path: "/training" },
     { name: "Training & Internship", icon: <GraduationCap size={18} />, path: "/training-internship" },
+    { name: "My Learnings", icon: <BookOpen size={18} />, path: "/my-learnings" },
   ];
 
   return (
