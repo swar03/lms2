@@ -1,0 +1,188 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  STUDENT
+}
+
+enum EnrollmentStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+// Main user model (admin/manager/student)
+model User {
+  id             String         @id @default(uuid())
+  email          String         @unique
+  fullName       String
+  password       String? // For login (manager/student)
+  role           Role
+  createdAt      DateTime       @default(now())
+  enrollments    Enrollment[]
+  submissions    Submission[]
+  managedCourses Course[]       @relation("CourseManager")
+  notifications  Notification[]
+  certificates   Certificate[] // <-- NEW
+  progress       UserProgress[] // <-- NEW
+}
+
+// Main course model
+model Course {
+  id           String         @id @default(uuid())
+  title        String
+  description  String?
+  managerId    String
+  createdAt    DateTime       @default(now())
+  manager      User           @relation("CourseManager", fields: [managerId], references: [id])
+  modules      Module[]
+  enrollments  Enrollment[]
+  certificates Certificate[]
+  UserProgress UserProgress[]
+
+  @@unique([title]) // allow upsert by title
+}
+
+// Module (sections of a course)
+model Module {
+  id           String         @id @default(uuid())
+  title        String
+  order        Int
+  courseId     String
+  createdAt    DateTime       @default(now())
+  course       Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lectures     Lecture[]
+  assignments  Assignment[]
+  quizzes      Quiz[]
+  progress     UserProgress[]
+  certificates Certificate[]
+
+  @@unique([title, courseId])
+}
+
+// Lecture (single video item)
+model Lecture {
+  id        String         @id @default(uuid())
+  title     String
+  videoUrl  String // YouTube/external link for prod, local for dev
+  order     Int
+  moduleId  String
+  createdAt DateTime       @default(now())
+  module    Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress  UserProgress[]
+
+  @@unique([title, moduleId])
+}
+
+// Assignment (task with Google Drive/TryHackMe/HTB link)
+model Assignment {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  taskUrl     String? // TryHackMe, HTB, Docs, etc.
+  moduleId    String
+  createdAt   DateTime     @default(now())
+  module      Module       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+
+  @@unique([title, moduleId])
+}
+
+// Quiz (questions and auto-grade logic)
+model Quiz {
+  id          String       @id @default(uuid())
+  title       String
+  questions   Json // Should include "correct" answers for auto-grade
+  moduleId    String
+  createdAt   DateTime     @default(now())
+  module      Module       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+
+  @@unique([title, moduleId])
+}
+
+// Assignment / Quiz submission, extended for quiz auto-grading
+model Submission {
+  id           String      @id @default(uuid())
+  assignmentId String?
+  quizId       String?
+  studentId    String
+  gdriveLink   String?
+  answers      Json? // Quiz answers
+  submittedAt  DateTime    @default(now())
+  score        Float? // <-- NEW (auto-graded)
+  feedback     String? // <-- NEW (auto-graded)
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id])
+  quiz         Quiz?       @relation(fields: [quizId], references: [id])
+  student      User        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+  @@unique([quizId, studentId])
+}
+
+model Enrollment {
+  id        String           @id @default(uuid())
+  status    EnrollmentStatus @default(PENDING)
+  studentId String
+  courseId  String
+  createdAt DateTime         @default(now())
+  student   User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course    Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+}
+
+// Internal dashboard notification system (no emails)
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String // e.g. 'REGISTRATION', 'APPROVAL'
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/**
+ * NEW: Certificate (for module/course completion)
+ * Each certificate can be issued for a module or entire course.
+ */
+model Certificate {
+  id       String   @id @default(uuid())
+  userId   String
+  courseId String
+  moduleId String? // Nullable if it's a course completion
+  issuedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module   Module?  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+}
+
+/**
+ * NEW: UserProgress (tracks per-lecture/module completion for circular pie)
+ * moduleId is optional for expansions (could include per-lecture).
+ */
+model UserProgress {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  moduleId  String?
+  lectureId String?
+  completed Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module    Module?  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lecture   Lecture? @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+}
