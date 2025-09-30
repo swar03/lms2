@@ -5,15 +5,19 @@ import { Toaster } from 'react-hot-toast';
 // Core Components
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
+import NotFound from './components/NotFound';
 
 // Pages
 import LoginPage from './pages/LoginPage';
 import StudentDashboard from './pages/StudentDashboard';
+import ManagerDashboard from './pages/ManagerDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import CoursePage from './pages/CoursePage';
 
 function App() {
   return (
-    <>
+    <ErrorBoundary>
       <Toaster 
         position="top-center" 
         reverseOrder={false}
@@ -40,6 +44,26 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route 
+          path="/manager-dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ManagerDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/course/:courseId"
           element={
@@ -50,8 +74,11 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
+        {/* 404 Route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </ErrorBoundary>
   );
 }
 
