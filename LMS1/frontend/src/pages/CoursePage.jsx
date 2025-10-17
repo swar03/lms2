@@ -2,8 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { allCourses } from '../data/mockData';
 import { calculateCourseProgress, checkCourseCompletion } from '../utils/progress';
+import api from '../services/api';
 
 import ProgressBar from '../components/ProgressBar';
 import ModuleAccordion from '../components/ModuleAccordion';
@@ -15,7 +15,8 @@ import CertificateModal from '../components/CertificateModal';
 const CoursePage = () => {
   const { courseId } = useParams();
   const { user } = useAuth();
-  const course = allCourses.find(c => c.id === courseId);
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [progress, setProgress] = useState({ lectures: {}, assignments: {}, quizzes: {} });
   const [activeModal, setActiveModal] = useState(null);
@@ -23,6 +24,21 @@ const CoursePage = () => {
 
   const courseProgress = useMemo(() => calculateCourseProgress(course, progress), [course, progress]);
   const isCourseCompleted = useMemo(() => checkCourseCompletion(course, progress), [course, progress]);
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        const response = await api.get(`/courses/${courseId}`);
+        setCourse(response.data);
+      } catch (error) {
+        console.error('Error fetching course:', error);
+        toast.error('Failed to load course');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourse();
+  }, [courseId]);
 
   useEffect(() => {
     if (isCourseCompleted) {
@@ -50,6 +66,14 @@ const CoursePage = () => {
     setActiveModal(null);
     setModalData(null);
   };
+
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <div className="text-white">Loading course...</div>
+      </div>
+    );
+  }
 
   if (!course) {
     return (

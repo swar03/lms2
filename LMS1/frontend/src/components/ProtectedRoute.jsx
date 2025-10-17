@@ -1,18 +1,22 @@
-// src/components/ProtectedRoute.jsx
+import { Navigate, Outlet } from 'react-router-dom';
 
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-
-const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
-
-  if (!user) {
-    // If user is not logged in, redirect them to the login page
-    return <Navigate to="/" />;
+export default function ProtectedRoute({ roles, children }) {
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  if (!token || !user.id) {
+    return <Navigate to="/login" replace />;
   }
-
-  return children;
-};
-
-export default ProtectedRoute;
+  
+  // Check roles if specified
+  if (Array.isArray(roles) && roles.length > 0) {
+    const userRole = user.role || (user.roles && user.roles[0]);
+    const hasRole = roles.includes(userRole);
+    if (!hasRole) {
+      return <Navigate to="/login" replace />;
+    }
+  }
+  
+  if (children) return children;
+  return <Outlet />;
+}

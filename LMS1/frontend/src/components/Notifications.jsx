@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
-import apiService from '../services/api';
+import { getNotifications, markNotificationAsRead } from '../services/api';
 import { BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const Notifications = () => {
@@ -19,7 +19,7 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await apiService.getNotifications();
+      const response = await getNotifications();
       setNotifications(response.notifications || []);
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -30,7 +30,7 @@ const Notifications = () => {
 
   const markAsRead = async (notificationId) => {
     try {
-      await apiService.markNotificationAsRead(notificationId);
+      await markNotificationAsRead(notificationId);
       setNotifications(prev => 
         prev.filter(notification => notification.id !== notificationId)
       );
@@ -44,7 +44,7 @@ const Notifications = () => {
   const markAllAsRead = async () => {
     try {
       const promises = notifications.map(notification => 
-        apiService.markNotificationAsRead(notification.id)
+        markNotificationAsRead(notification.id)
       );
       await Promise.all(promises);
       setNotifications([]);

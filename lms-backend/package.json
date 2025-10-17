@@ -3,24 +3,56 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.production.js",
+    "dev": "nodemon src/server.production.js",
+    "start:simple": "node src/minimal-server.js",
+    "setup": "npx prisma generate && npx prisma db push && node prisma/seed-admin.js",
+    "seed:admin": "node prisma/seed-admin.js",
+    "test:email": "node test-email-api.js",
+    "test:endpoint": "node test-single-endpoint.js",
+    "verify": "node verify-all-apis.js",
+    "test:integration": "node test-integration.js",
+    "migrate": "npx prisma migrate dev",
+    "seed": "npx prisma db seed",
+    "studio": "npx prisma studio",
+    "test-enrollment": "node test-enrollment.js",
+    "reset-db": "npx prisma migrate reset",
+    "generate": "npx prisma generate"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^6.16.2",
+    "@adminjs/express": "^6.1.1",
+    "@adminjs/prisma": "^5.0.4",
+    "@aws-sdk/client-ses": "^3.910.0",
+    "@prisma/client": "^6.17.1",
+    "adminjs": "^7.8.17",
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "express-list-endpoints": "^7.1.1",
-    "google-auth-library": "^10.3.0",
+    "express-rate-limit": "^8.1.0",
+    "express-session": "^1.18.2",
+
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^6.16.2"
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.9",
+
+    "pdfkit": "^0.17.2",
+    "pg": "^8.16.3",
+    "react-countup": "^6.5.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "prisma": "^6.17.1"
   }
-  
 }

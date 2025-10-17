@@ -1,85 +1,97 @@
+// LMS1/frontend/src/App.jsx
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-
-// Core Components
-import Layout from './components/Layout';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
-import ErrorBoundary from './components/ErrorBoundary';
-import NotFound from './components/NotFound';
-
-// Pages
+import NotFound from './pages/NotFound';
 import LoginPage from './pages/LoginPage';
+import TestLoginPage from './pages/TestLoginPage';
 import StudentDashboard from './pages/StudentDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import SimpleAdminPanel from './pages/SimpleAdminPanel';
+import AdminStudentManagement from './pages/AdminStudentManagement';
 import CoursePage from './pages/CoursePage';
+import OnboardingPage from './pages/OnboardingPage';
+import RegisterPage from './pages/RegisterPage';
+import VerifyOTPPage from './pages/VerifyOTPPage';
+import CompleteProfilePage from './pages/CompleteProfilePage';
+import CompleteProfileForm from './pages/CompleteProfileForm';
+import TestDashboard from './pages/TestDashboard';
+import Layout from './components/Layout';
 
-function App() {
+export default function App() {
   return (
-    <ErrorBoundary>
-      <Toaster 
-        position="top-center" 
-        reverseOrder={false}
-        toastOptions={{
-          className: '',
-          style: {
-            background: '#333',
-            color: '#fff',
-          },
-        }}
-      />
+    <>
       <Routes>
-        {/* Public Route */}
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/verify-otp" element={<VerifyOTPPage />} />
+        <Route path="/complete-profile" element={<CompleteProfilePage />} />
+        <Route path="/profile-form" element={<CompleteProfileForm />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/test-dashboard" element={<TestDashboard />} />
 
-        {/* Protected Routes inside the Layout */}
-        <Route 
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
+        <Route element={<ProtectedRoute roles={['STUDENT']} />}>
+          <Route
+            path="/dashboard"
+            element={
               <Layout>
                 <StudentDashboard />
               </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route 
-          path="/manager-dashboard"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <ManagerDashboard />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route 
-          path="/admin-dashboard"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <AdminDashboard />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/course/:courseId"
-          element={
-            <ProtectedRoute>
+            }
+          />
+          <Route
+            path="/course/:courseId"
+            element={
               <Layout>
                 <CoursePage />
               </Layout>
-            </ProtectedRoute>
-          }
-        />
-        
-        {/* 404 Route */}
+            }
+          />
+        </Route>
+
+        <Route element={<ProtectedRoute roles={['MANAGER']} />}>
+          <Route
+            path="/manager-dashboard"
+            element={
+              <Layout>
+                <ManagerDashboard />
+              </Layout>
+            }
+          />
+        </Route>
+
+        <Route element={<ProtectedRoute roles={['ADMIN']} />}>
+          <Route
+            path="/admin-dashboard"
+            element={
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin-students"
+            element={
+              <Layout>
+                <AdminStudentManagement />
+              </Layout>
+            }
+          />
+          <Route
+            path="/simple-admin"
+            element={
+              <Layout>
+                <SimpleAdminPanel />
+              </Layout>
+            }
+          />
+        </Route>
+
+        <Route path="/notfound" element={<NotFound />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </ErrorBoundary>
+    </>
   );
 }
-
-export default App;

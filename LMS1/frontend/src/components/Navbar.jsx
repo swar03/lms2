@@ -4,10 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import bgImage from '../assets/logo.png';
 import Notifications from './Notifications';
+import ProfileModal from './ProfileModal';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -28,6 +30,19 @@ const Navbar = () => {
           </div>
           {user && (
             <div className="flex items-center space-x-4">
+              {/* Profile Icon */}
+              {user.role === 'STUDENT' && (
+                <button
+                  onClick={() => setShowProfileModal(true)}
+                  className="p-2 text-gray-400 hover:text-white transition-colors"
+                  title="View Profile"
+                >
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </button>
+              )}
+              
               {/* Notifications */}
               <Notifications />
               
@@ -40,10 +55,10 @@ const Navbar = () => {
                   <span className="sr-only">Open user menu</span>
                   <img
                     className="h-9 w-9 rounded-full object-cover"
-                    src={user.picture || `https://ui-avatars.com/api/?name=${user.name}&background=4f46e5&color=fff`}
+                    src={user.picture || `https://ui-avatars.com/api/?name=${user.fullName || user.name}&background=4f46e5&color=fff`}
                     alt="User avatar"
                   />
-                  <span className="hidden md:block ml-3 text-white font-medium">{user.name}</span>
+                  <span className="hidden md:block ml-3 text-white font-medium">{user.fullName || user.name}</span>
                   <svg className={`hidden md:block ml-1 h-5 w-5 text-white transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
@@ -67,13 +82,29 @@ const Navbar = () => {
                       </Link>
                     )}
                     {user.role === 'ADMIN' && (
-                      <Link
-                        to="/admin-dashboard"
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        Admin Dashboard
-                      </Link>
+                      <>
+                        <Link
+                          to="/admin-dashboard"
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          Admin Dashboard
+                        </Link>
+                        <Link
+                          to="/admin-students"
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          👥 Student Management
+                        </Link>
+                        <Link
+                          to="/simple-admin"
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          🛠️ Simple Admin Panel
+                        </Link>
+                      </>
                     )}
                     <button
                       onClick={handleLogout}
@@ -88,6 +119,9 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      
+      {/* Profile Modal */}
+      <ProfileModal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} />
     </nav>
   );
 };

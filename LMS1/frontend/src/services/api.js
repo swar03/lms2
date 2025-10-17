@@ -1,135 +1,200 @@
-// src/services/api.js
-const API_BASE_URL = 'http://localhost:3000/api';
+import axios from 'axios';
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+const api = axios.create({
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
 
-class ApiService {
-  constructor() {
-    this.baseURL = API_BASE_URL;
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  return config;
+});
 
-  // Helper method to get auth headers
-  getAuthHeaders() {
-    const token = localStorage.getItem('jwt_token');
-    return {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` })
-    };
-  }
-
-  // Generic request method
-  async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
-    const config = {
-      headers: this.getAuthHeaders(),
-      ...options
-    };
-
-    try {
-      const response = await fetch(url, config);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Request failed');
-      }
-
-      return data;
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    if (status === 401) {
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } catch {}
     }
+    return Promise.reject(error);
   }
+);
 
-  // Auth endpoints
-  async googleLogin(idToken) {
-    return this.request('/auth/google', {
-      method: 'POST',
-      body: JSON.stringify({ idToken })
-    });
-  }
-
-  async register(userData) {
-    return this.request('/register', {
-      method: 'POST',
-      body: JSON.stringify(userData)
-    });
-  }
-
-  async login(email, password) {
-    return this.request('/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password })
-    });
-  }
-
-  // Course endpoints
-  async getCourses() {
-    return this.request('/courses');
-  }
-
-  async getCourseById(courseId) {
-    return this.request(`/courses/${courseId}`);
-  }
-
-  // Module endpoints
-  async getModules() {
-    return this.request('/modules');
-  }
-
-  // Lecture endpoints
-  async getLectures() {
-    return this.request('/lectures');
-  }
-
-  // Assignment endpoints
-  async getAssignments() {
-    return this.request('/assignments');
-  }
-
-  // Quiz endpoints
-  async getQuizzes() {
-    return this.request('/quizzes');
-  }
-
-  // Enrollment endpoints
-  async getPendingEnrollments() {
-    return this.request('/enrollments/pending');
-  }
-
-  async approveEnrollment(enrollmentId) {
-    return this.request(`/enrollments/${enrollmentId}/approve`, {
-      method: 'POST'
-    });
-  }
-
-  async denyEnrollment(enrollmentId) {
-    return this.request(`/enrollments/${enrollmentId}/deny`, {
-      method: 'POST'
-    });
-  }
-
-  // Submission endpoints
-  async submitAssignment(submissionData) {
-    return this.request('/submit', {
-      method: 'POST',
-      body: JSON.stringify(submissionData)
-    });
-  }
-
-  // Notification endpoints
-  async getNotifications() {
-    return this.request('/notifications');
-  }
-
-  async markNotificationAsRead(notificationId) {
-    return this.request('/notifications/read', {
-      method: 'POST',
-      body: JSON.stringify({ notificationId })
-    });
-  }
-
-  // User endpoints
-  async getUsers() {
-    return this.request('/users');
-  }
+// Auth functions
+export async function register(fullName, email, mobile, password) {
+  const { data } = await api.post('/auth/register', { fullName, email, mobile, password });
+  return data;
 }
 
-export default new ApiService();
+export async function emailLogin(email, password) {
+  const { data } = await api.post('/auth/login', { email, password });
+  return data;
+}
+
+export async function verifyOTP(email, otp) {
+  const { data } = await api.post('/auth/verify-otp', { email, otp });
+  return data;
+}
+
+export async function resendOTP(email) {
+  const { data } = await api.post('/auth/resend-otp', { email });
+  return data;
+}
+
+export async function getMe() {
+  const { data } = await api.get('/auth/me');
+  return data;
+}
+
+export async function updateProfile(profileData) {
+  const { data } = await api.put('/users/profile', profileData);
+  return data;
+}
+
+export async function testAuth(email, role, fullName) {
+  const { data } = await api.post('/auth/test', { email, role, fullName });
+  return data;
+}
+
+// User functions
+export async function listUsers() {
+  const { data } = await api.get('/users');
+  return data;
+}
+
+// Course functions
+export async function getCourses() {
+  const { data } = await api.get('/courses');
+  return data;
+}
+
+export async function getModules(courseId) {
+  const { data } = await api.get(`/modules/${encodeURIComponent(courseId)}`);
+  return data;
+}
+
+// Enrollment functions
+export async function requestEnrollment(payload) {
+  const { data } = await api.post('/enrollments', payload);
+  return data;
+}
+
+export async function approveEnrollment(enrollmentId) {
+  const { data } = await api.post(`/enrollments/${encodeURIComponent(enrollmentId)}/approve`);
+  return data;
+}
+
+export async function denyEnrollment(enrollmentId) {
+  const { data } = await api.post(`/enrollments/${encodeURIComponent(enrollmentId)}/deny`);
+  return data;
+}
+
+// Dashboard functions
+export async function getAdminDashboard() {
+  const { data } = await api.get('/dashboard/admin');
+  return data;
+}
+
+export async function getManagerDashboard() {
+  const { data } = await api.get('/dashboard/manager');
+  return data;
+}
+
+export async function getStudentDashboard() {
+  const { data } = await api.get('/dashboard/student');
+  return data;
+}
+
+// Notification functions
+export async function getNotifications() {
+  const { data } = await api.get('/notifications');
+  return data;
+}
+
+export async function markNotificationAsRead(notificationId) {
+  const { data } = await api.post(`/notifications/${notificationId}/read`);
+  return data;
+}
+
+// Submission functions
+export async function submitAssignment(assignmentId, gdriveLink) {
+  const { data } = await api.post('/submit', {
+    assignmentId,
+    gdriveLink
+  });
+  return data;
+}
+
+export async function submitQuiz(quizId, answers) {
+  const { data } = await api.post('/submit', {
+    quizId,
+    answers
+  });
+  return data;
+}
+
+export async function getMySubmissions() {
+  const { data } = await api.get('/submissions/my');
+  return data;
+}
+
+// Add googleLogin as empty function to prevent import errors
+export async function googleLogin() {
+  throw new Error('Google Auth not implemented');
+}
+
+// Export the axios instance as default
+export default api;
+
+// Also export as named export for compatibility
+export { api };
+
+// Export service object
+export const apiService = {
+  // Auth
+  register,
+  emailLogin,
+  googleLogin,
+  getMe,
+  updateProfile,
+  testAuth,
+  
+  // Users
+  listUsers,
+  
+  // Courses
+  getCourses,
+  getModules,
+  
+  // Enrollments
+  requestEnrollment,
+  approveEnrollment,
+  denyEnrollment,
+  
+  // Dashboard
+  getAdminDashboard,
+  getManagerDashboard,
+  getStudentDashboard,
+  
+  // Notifications
+  getNotifications,
+  markNotificationAsRead,
+  
+  // Submissions
+  submitAssignment,
+  submitQuiz,
+  getMySubmissions,
+};
+
+

@@ -1,5 +1,4 @@
-// schema.prisma
-
+// schema.prisma - Production Grade LMS Schema
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,174 +14,266 @@ enum Role {
   STUDENT
 }
 
-enum EnrollmentStatus {
+enum UserStatus {
   PENDING
   APPROVED
-  DENIED
+  REJECTED
+  ABANDONED
 }
 
-// Main user model (admin/manager/student)
+enum ApprovalStatus {
+  APPROVED
+  REJECTED
+  PENDING
+}
+
+enum NotificationType {
+  NEW_USER
+  APPROVAL
+  CERTIFICATE
+  SYSTEM
+}
+
 model User {
-  id             String         @id @default(uuid())
-  email          String         @unique
-  fullName       String
-  password       String? // For login (manager/student)
-  role           Role
-  createdAt      DateTime       @default(now())
-  enrollments    Enrollment[]
-  submissions    Submission[]
-  managedCourses Course[]       @relation("CourseManager")
-  notifications  Notification[]
-  certificates   Certificate[] // <-- NEW
-  progress       UserProgress[] // <-- NEW
+  id            String        @id @default(uuid())
+  email         String        @unique
+  passwordHash  String?
+  fullName      String?
+  mobile        String?
+  city          String?
+  organization  String?
+  linkedin      String?
+  roles         Role[]        @default([])
+  status        UserStatus    @default(PENDING)
+  emailVerified Boolean       @default(false)
+  verificationToken String?
+  emailOTP      String?
+  otpExpiry     DateTime?
+  approvedById  String?       // FK to User who approved
+  approvalNote  String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+  
+  // Relations
+  profile       Profile?
+  admin         Admin?
+  manager       Manager?
+  approvals     Approval[]    @relation("userApprovals")
+  actorApprovals Approval[]   @relation("actorApprovals")
+  notifications Notification[]
+  auditLogs     AuditLog[]    @relation("actorLogs")
+  submissions   Submission[]
+  certificates  Certificate[]
+  
+  @@index([status])
+  @@index([createdAt])
 }
 
-// Main course model
+model Profile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  occupation     String?
+  country        String?
+  whatsapp       String?
+  dateOfBirth    DateTime?
+  gender         String?
+  address        String?
+  education      String?
+  experience     String?
+  skills         String?  // JSON string
+  certifications String?  // JSON string for certifications
+  profileComplete Boolean @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Manager {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Approval {
+  id         String         @id @default(uuid())
+  userId     String
+  user       User           @relation("userApprovals", fields: [userId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?          @relation("actorApprovals", fields: [actorId], references: [id])
+  note       String?
+  status     ApprovalStatus @default(PENDING)
+  ipAddress  String?
+  createdAt  DateTime       @default(now())
+  
+  @@index([userId])
+  @@index([status])
+}
+
 model Course {
-  id           String         @id @default(uuid())
-  title        String
-  description  String?
-  managerId    String
-  createdAt    DateTime       @default(now())
-  manager      User           @relation("CourseManager", fields: [managerId], references: [id])
-  modules      Module[]
-  enrollments  Enrollment[]
-  certificates Certificate[]
-  UserProgress UserProgress[]
-
-  @@unique([title]) // allow upsert by title
-}
-
-// Module (sections of a course)
-model Module {
-  id           String         @id @default(uuid())
-  title        String
-  order        Int
-  courseId     String
-  createdAt    DateTime       @default(now())
-  course       Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lectures     Lecture[]
-  assignments  Assignment[]
-  quizzes      Quiz[]
-  progress     UserProgress[]
-  certificates Certificate[]
-
-  @@unique([title, courseId])
-}
-
-// Lecture (single video item)
-model Lecture {
-  id        String         @id @default(uuid())
-  title     String
-  videoUrl  String // YouTube/external link for prod, local for dev
-  order     Int
-  moduleId  String
-  createdAt DateTime       @default(now())
-  module    Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  progress  UserProgress[]
-
-  @@unique([title, moduleId])
-}
-
-// Assignment (task with Google Drive/TryHackMe/HTB link)
-model Assignment {
-  id          String       @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
-  taskUrl     String? // TryHackMe, HTB, Docs, etc.
-  moduleId    String
-  createdAt   DateTime     @default(now())
-  module      Module       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  submissions Submission[]
-
-  @@unique([title, moduleId])
+  modules     Module[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  
+  @@unique([title])
 }
 
-// Quiz (questions and auto-grade logic)
-model Quiz {
-  id          String       @id @default(uuid())
+model Module {
+  id          String    @id @default(uuid())
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
   title       String
-  questions   Json // Should include "correct" answers for auto-grade
+  description String?
+  order       Int       @default(0)
+  lectures    Lecture[]
+  certificates Certificate[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  
+  @@index([courseId])
+  @@unique([courseId, title])
+}
+
+model Lecture {
+  id          String    @id @default(uuid())
   moduleId    String
-  createdAt   DateTime     @default(now())
-  module      Module       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  order       Int       @default(0)
+  videoUrl    String
+  quiz        Quiz?
+  assignment  Assignment?
   submissions Submission[]
-
-  @@unique([title, moduleId])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  
+  @@index([moduleId])
+  @@unique([moduleId, title])
 }
 
-// Assignment / Quiz submission, extended for quiz auto-grading
+model Assignment {
+  id          String     @id @default(uuid())
+  lectureId   String     @unique
+  lecture     Lecture    @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  title       String
+  instructions String?
+  submissions Submission[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+}
+
+model Quiz {
+  id         String     @id @default(uuid())
+  lectureId  String     @unique
+  lecture    Lecture    @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  title      String
+  questions  Question[]
+  submissions Submission[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+}
+
+model Question {
+  id        String    @id @default(uuid())
+  quizId    String
+  quiz      Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  text      String
+  choices   Choice[]
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@index([quizId])
+}
+
+model Choice {
+  id         String   @id @default(uuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  isCorrect  Boolean  @default(false)
+}
+
 model Submission {
-  id           String      @id @default(uuid())
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lectureId    String?
+  lecture      Lecture?  @relation(fields: [lectureId], references: [id])
+  moduleId     String?
   assignmentId String?
-  quizId       String?
-  studentId    String
-  gdriveLink   String?
-  answers      Json? // Quiz answers
-  submittedAt  DateTime    @default(now())
-  score        Float? // <-- NEW (auto-graded)
-  feedback     String? // <-- NEW (auto-graded)
   assignment   Assignment? @relation(fields: [assignmentId], references: [id])
-  quiz         Quiz?       @relation(fields: [quizId], references: [id])
-  student      User        @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
-  @@unique([assignmentId, studentId])
-  @@unique([quizId, studentId])
+  quizId       String?
+  quiz         Quiz?     @relation(fields: [quizId], references: [id])
+  assignmentLink String?
+  quizAnswers  Json?
+  score        Float?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([lectureId])
+  @@index([assignmentId])
+  @@index([quizId])
+  @@unique([userId, assignmentId], name: "user_assignment_unique")
+  @@unique([userId, quizId], name: "user_quiz_unique")
 }
 
-model Enrollment {
-  id        String           @id @default(uuid())
-  status    EnrollmentStatus @default(PENDING)
-  studentId String
-  courseId  String
-  createdAt DateTime         @default(now())
-  student   User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  course    Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([studentId, courseId])
-}
-
-// Internal dashboard notification system (no emails)
-model Notification {
-  id        String   @id @default(uuid())
-  userId    String
-  type      String // e.g. 'REGISTRATION', 'APPROVAL'
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-/**
- * NEW: Certificate (for module/course completion)
- * Each certificate can be issued for a module or entire course.
- */
 model Certificate {
-  id       String   @id @default(uuid())
-  userId   String
-  courseId String
-  moduleId String? // Nullable if it's a course completion
-  issuedAt DateTime @default(now())
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  module   Module?  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  id               String   @id @default(uuid())
+  certificateNumber String  @unique @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId         String
+  module           Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  s3Url            String
+  issuedAt         DateTime @default(now())
 }
 
-/**
- * NEW: UserProgress (tracks per-lecture/module completion for circular pie)
- * moduleId is optional for expansions (could include per-lecture).
- */
-model UserProgress {
-  id        String   @id @default(uuid())
-  userId    String
-  courseId  String
-  moduleId  String?
-  lectureId String?
-  completed Boolean  @default(false)
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  module    Module?  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  lecture   Lecture? @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+model Notification {
+  id           String           @id @default(uuid())
+  recipientId  String
+  recipient    User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  type         NotificationType
+  message      String
+  read         Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  expiresAt    DateTime?
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  actor      User?    @relation("actorLogs", fields: [actorId], references: [id])
+  action     String   // e.g., "APPROVE_USER", "DELETE_COURSE", "EXPORT_USERS"
+  entityType String?
+  entityId   String?
+  ip         String?
+  createdAt  DateTime @default(now())
+}
+
+model SystemConfig {
+  id                 Int     @id @default(1)
+  autoApproveDays    Int     @default(3)
+  paginationLimit    Int     @default(50)
+  rateLimitPer15Min  Int     @default(20)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

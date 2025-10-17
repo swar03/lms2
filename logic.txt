@@ -1,0 +1,251 @@
+there will be a single course created and edited and deleted by admin to user mainly student account, admin is also a user but admin will have most priority based access and will have all edit access and delete all courses and can give access accept or reject users together in bulk and also list of users will be avaible , there wil be list all member i.e users , managers, all  like All
+Members
+Managers
+Pending Approval
+Abandoned checkout and make sure you can export that list from admin panel built in express only for admin , admin can view the request of each and every student reuqest after register on our portal, admin can approve or deny that request after viewing his basic porfile which is made after registering and login and completing his porfie by filling form and basic deatils about him role:- studnent , working , profiessional9as asked in basic survey questions and gather all user data and store it in tbale for later viewsing for amdin while accepting the studnet for the portal or platform reading his entered details , get the detils in amdin panel first in notiifcation with the student name who logged in and fllled form and then in the list of all user or memebers. so after studsents fills the form he will be able to get on to the studnet dahsbord where he  will be shouwn waitng for apprvl of course and he ha to wait until manager or admin, one of the either accepta that stuswnt id with viewing the details,if maabegr accept sthe student request then it should show accpeted in his list if the admin accpet sit should show manager only students list and that partivclaur student id is accpeted in the databse and manager shold be shown accepted requst witth 2 button accept or reeject. then the student will egt notified for the course and his logged in id can view the course content:-first create this logic for backend 
+
+
+Will each user have only one profile record, or can users have multiple profiles (e.g., different roles under one account)? - yes they can have diffrent roles under one account. Should the user profile data (LinkedIn, WhatsApp, Organization, etc.) be part of the User table or a separate Profile model linked by userId? separate Profile model linked by userId.Will there always be only one active course (single global course for everyone), or should the design support multiple courses for future scaling?for now admin should have only access to create single course and perfrom crud in modules and lecuree itself.Should modules and lectures be fully manageable (Create, Read, Update, Delete) by the admin via API endpoints?yes it should be managebale from amdin endpoints, it should all be well conneted thhourout all the portal.For each lecture (YouTube video), what fields are required?-
+Example: title, , videoUrl.Should lectures be ordered numerically (e.g., Lecture 1, Lecture 2...) or allow drag-and-drop order in UI (update via an “order” column)? not nessaery ordered numerically, it should be uploaded in the given module only, those lecure should not mixed up with other lecture i.e url. no drag and drop for this order in ui, but make a ui like this :-Add Link
+
+Direct your members to Video,assigmnet or quiz. the container will eb same, but that contianer will have three things atleast video assigment and quiz on that particular asigment theory basis.Do we need soft deletes (mark as deleted) or hard deletes (permanent removal) for courses/modules/lectures?-soft delete. Do all new users (students, managers, etc.) require manual approval after registration, or only students?- only student require manual approval after regsteraiotn, manger won;t get a form after signup or signin and they don;t need to signup as their form id ,password ,name and email address and password will be with admin,so they don;t need to create their id by signing up , only student will get created , but they can have multiple role, but that role changing access only admin can have, admin can have student dahsboard and can view lecure as student and can be a manager and can view manager dahsbaord on his oiwn id but manager can only be manager and student, but only student can be student.Signup options:
+Google login (OAuth)
+Email/password (with verification code)
+Both? - both will be much better for student, but incase of managers he can direclty login with email and password he got from admin, as there will be aorunf 7-10 managers, so everyone will hae their id ,phone,email.password .etc. Which fields are mandatory in the registration/profile form?
+(e.g., Name, Email, Country, City, Organization, Occupation, WhatsApp, LinkedIn, Certifications)-this will eb generated after the login of student and is for student only , and the filed like (name*,city*,org*,occupation*,linkeidn link(not compulsory skip) ,certificaiton (skip)) make it like a porfillesional suvery form giviing diffrent options and that option will be selected and enter d in his id or he can choos eotehr and write his own answer , make it liek a slider animation form one by one after next qursiotn wiht clicbakle buttons. make the UI better 
+
+
+Will each user have only one profile record, or can users have multiple profiles (e.g., different roles under one account)? - yes they can have diffrent roles under one account. Should the user profile data (LinkedIn, WhatsApp, Organization, etc.) be part of the User table or a separate Profile model linked by userId? separate Profile model linked by userId.Will there always be only one active course (single global course for everyone), or should the design support multiple courses for future scaling?for now admin should have only access to create single course and perfrom crud in modules and lecuree itself.Should modules and lectures be fully manageable (Create, Read, Update, Delete) by the admin via API endpoints?yes it should be managebale from amdin endpoints, it should all be well conneted thhourout all the portal.For each lecture (YouTube video), what fields are required?-
+Example: title, , videoUrl.Should lectures be ordered numerically (e.g., Lecture 1, Lecture 2...) or allow drag-and-drop order in UI (update via an “order” column)? not nessaery ordered numerically, it should be uploaded in the given module only, those lecure should not mixed up with other lecture i.e url. no drag and drop for this order in ui, but make a ui like this :-Add Link
+
+Direct your members to Video,assigmnet or quiz. the container will eb same, but that contianer will have three things atleast video assigment and quiz on that particular asigment theory basis.Do we need soft deletes (mark as deleted) or hard deletes (permanent removal) for courses/modules/lectures?-soft delete. Do all new users (students, managers, etc.) require manual approval after registration, or only students?- only student require manual approval after regsteraiotn, manger won;t get a form after signup or signin and they don;t need to signup as their form id ,password ,name and email address and password will be with admin,so they don;t need to create their id by signing up , only student will get created , but they can have multiple role, but that role changing access only admin can have, admin can have student dahsboard and can view lecure as student and can be a manager and can view manager dahsbaord on his oiwn id but manager can only be manager and student, but only student can be student.Signup options:
+Google login (OAuth)
+Email/password (with verification code)
+Both? - both will be much better for student, but incase of managers he can direclty login with email and password he got from admin, as there will be aorunf 7-10 managers, so everyone will hae their id ,phone,email.password .etc. Which fields are mandatory in the registration/profile form?
+(e.g., Name, Email, Country, City, Organization, Occupation, WhatsApp, LinkedIn, Certifications)-this will eb generated after the login of student and is for student only , and the filed like (name*,city*,org*,occupation*,linkeidn link(not compulsory skip) ,certificaiton (skip)) make it like a porfillesional suvery form giviing diffrent options and that option will be selected and enter d in his id or he can choos eotehr and write his own answer , make it liek a slider animation form one by one after next qursiotn wiht clicbakle buttons. make the UI better . Should optional fields (e.g., LinkedIn) still appear for all, or only for professionals?-for all.Should email verification be handled via:
+SMTP (Nodemailer) or
+an external service (SendGrid, Mailgun, AWS SES)?- aws ses if it is easy or suggest something else if not easy to intergrate.When admin/manager approves a user, should that approval be recorded in:
+a separate Approval table, or
+a field inside User model (e.g., status: "pending" | "approved" | "rejected")?in a seprrate approval table which is connected to the user model, it will easy it we keep i sperate.When a user is denied, should they be:
+deleted immediately,
+or marked as rejected (can reapply later)?-marked as rejected (can reapply later) and notifcaiotn is sent to that user id from admin id or manager id for this rejeted aporval.Should unverified or inactive users automatically move to “Abandoned” list after a set period? If yes, how many days? No need, let the users stay.Confirm role hierarchy: ADMIN, MANAGER, STUDENT.
+Any others (e.g., SUPERADMIN, MENTOR, REVIEWER)? no others, bascially my admin is my superuser or superadmin as he will be having access, so hide his login or credenials and allow only the login for the code dveeloper only in the backend.Can a manager:
+Approve/reject students,
+Create/edit courses or only manage existing ones,
+View all students or only those assigned to them?- manager can only Approve/reject students, just like amdin by view their porfile and View all students names and list the list which are with admin, that will be the common list.Should role-based middleware be enforced via JWT claims or database lookup each time?- enfore role based middleware .Should we track who approved/edited/deleted each entity (audit log)?- yes please keep a track in backend.What filters do you want on the “All Members” page?
+
+All Members
+
+Managers
+
+Pending Approval
+
+Abandoned
+
+Rejected
+
+Active- i want :-What filters do you want on the “All Members” page?
+
+All Members
+
+Managers
+
+Pending Approval
+
+Abandoned
+
+Rejected
+What exact fields should appear in the exported CSV/XLS?
+(e.g., name, email, role, status, city, organization, LinkedIn, course progress)-name, email, role, status, city, organization, LinkedIn, course progress-in course progress, it will be based on clikcing view the video , submmitng the assigmnet and attmeplting the quiz moduke wise.make the percentage out of all the 6 -7 modules present out of 100% and for eg if the user has completer 3 modules do apporx update his or her porgress arounf 40% .Should bulk actions (“Approve All”, “Reject All”, “Delete All”) exist at API level, or only in frontend UI?:-ofcouse API level at large scale , i know it could be dnagerous, without view strusnet profile gignvg access to the portal entoolemtna and course view acecss, but it is a feature.Should exports be generated by backend (/export/users) or client-side CSV conversion?- backend export/users.Should exported lists include timestamps (signup date, approval date, last login)?-yes each and everything in csv format.
+
+
+
+Will each user have only one profile record, or can users have multiple profiles (e.g., different roles under one account)? - yes they can have diffrent roles under one account. Should the user profile data (LinkedIn, WhatsApp, Organization, etc.) be part of the User table or a separate Profile model linked by userId? separate Profile model linked by userId.Will there always be only one active course (single global course for everyone), or should the design support multiple courses for future scaling?for now admin should have only access to create single course and perfrom crud in modules and lecuree itself.Should modules and lectures be fully manageable (Create, Read, Update, Delete) by the admin via API endpoints?yes it should be managebale from amdin endpoints, it should all be well conneted thhourout all the portal.For each lecture (YouTube video), what fields are required?-
+Example: title, , videoUrl.Should lectures be ordered numerically (e.g., Lecture 1, Lecture 2...) or allow drag-and-drop order in UI (update via an “order” column)? not nessaery ordered numerically, it should be uploaded in the given module only, those lecure should not mixed up with other lecture i.e url. no drag and drop for this order in ui, but make a ui like this :-Add Link
+
+Direct your members to Video,assigmnet or quiz. the container will eb same, but that contianer will have three things atleast video assigment and quiz on that particular asigment theory basis.Do we need soft deletes (mark as deleted) or hard deletes (permanent removal) for courses/modules/lectures?-soft delete. Do all new users (students, managers, etc.) require manual approval after registration, or only students?- only student require manual approval after regsteraiotn, manger won;t get a form after signup or signin and they don;t need to signup as their form id ,password ,name and email address and password will be with admin,so they don;t need to create their id by signing up , only student will get created , but they can have multiple role, but that role changing access only admin can have, admin can have student dahsboard and can view lecure as student and can be a manager and can view manager dahsbaord on his oiwn id but manager can only be manager and student, but only student can be student.Signup options:
+Google login (OAuth)
+Email/password (with verification code)
+Both? - both will be much better for student, but incase of managers he can direclty login with email and password he got from admin, as there will be aorunf 7-10 managers, so everyone will hae their id ,phone,email.password .etc. Which fields are mandatory in the registration/profile form?
+(e.g., Name, Email, Country, City, Organization, Occupation, WhatsApp, LinkedIn, Certifications)-this will eb generated after the login of student and is for student only , and the filed like (name*,city*,org*,occupation*,linkeidn link(not compulsory skip) ,certificaiton (skip)) make it like a porfillesional suvery form giviing diffrent options and that option will be selected and enter d in his id or he can choos eotehr and write his own answer , make it liek a slider animation form one by one after next qursiotn wiht clicbakle buttons. make the UI better . Should optional fields (e.g., LinkedIn) still appear for all, or only for professionals?-for all.Should email verification be handled via:
+SMTP (Nodemailer) or
+an external service (SendGrid, Mailgun, AWS SES)?- aws ses if it is easy or suggest something else if not easy to intergrate.When admin/manager approves a user, should that approval be recorded in:
+a separate Approval table, or
+a field inside User model (e.g., status: "pending" | "approved" | "rejected")?in a seprrate approval table which is connected to the user model, it will easy it we keep i sperate.When a user is denied, should they be:
+deleted immediately,
+or marked as rejected (can reapply later)?-marked as rejected (can reapply later) and notifcaiotn is sent to that user id from admin id or manager id for this rejeted aporval.Should unverified or inactive users automatically move to “Abandoned” list after a set period? If yes, how many days? No need, let the users stay.Confirm role hierarchy: ADMIN, MANAGER, STUDENT.
+Any others (e.g., SUPERADMIN, MENTOR, REVIEWER)? no others, bascially my admin is my superuser or superadmin as he will be having access, so hide his login or credenials and allow only the login for the code dveeloper only in the backend.Can a manager:
+Approve/reject students,
+Create/edit courses or only manage existing ones,
+View all students or only those assigned to them?- manager can only Approve/reject students, just like amdin by view their porfile and View all students names and list the list which are with admin, that will be the common list.Should role-based middleware be enforced via JWT claims or database lookup each time?- enfore role based middleware .Should we track who approved/edited/deleted each entity (audit log)?- yes please keep a track in backend.What filters do you want on the “All Members” page?
+
+All Members
+
+Managers
+
+Pending Approval
+
+Abandoned
+
+Rejected
+
+Active- i want :-What filters do you want on the “All Members” page?
+
+All Members
+
+Managers
+
+Pending Approval
+
+Abandoned
+
+Rejected
+What exact fields should appear in the exported CSV/XLS?
+(e.g., name, email, role, status, city, organization, LinkedIn, course progress)-name, email, role, status, city, organization, LinkedIn, course progress-in course progress, it will be based on clikcing view the video , submmitng the assigmnet and attmeplting the quiz moduke wise.make the percentage out of all the 6 -7 modules present out of 100% and for eg if the user has completer 3 modules do apporx update his or her porgress arounf 40% .Should bulk actions (“Approve All”, “Reject All”, “Delete All”) exist at API level, or only in frontend UI?:-ofcouse API level at large scale , i know it could be dnagerous, without view strusnet profile gignvg access to the portal entoolemtna and course view acecss, but it is a feature.Should exports be generated by backend (/export/users) or client-side CSV conversion?- backend export/users.Should exported lists include timestamps (signup date, approval date, last login)?-yes each and everything in csv format.Should profile requests trigger both:
+Dashboard notification (in-app)- bascially dashboard notification for now, don't want to use email for this, only for signup verification of student.Should real-time notifications be implemented via:
+WebSockets (Socket.IO)
+or simple polling (REST updates every X seconds)?-WebSockets (Socket.IO).When a student is approved:
+Should only the student be notified,
+or also the approving manager/admin?- only the student be notified.Should the admin get a summary notification of pending approvals daily/weekly via email?- no don't put any notification, just auto accept all the notification after 3 days of not approval.Can only the admin create courses, or can managers add modules to an existing admin-created course? no, only admin can  create course.Should the backend support multiple modules per course and multiple lectures per module (as shown in your ERD)?it should support , but if not supports, then make it support it with changes in erd.Each module can have:
+Quizzes
+Assignments
+Certificates
+Should these all be optional per module, or mandatory?-make it mandatory as talking about certificate, studentid can claim it only after assigmnet and quiz submission.Should YouTube links be embedded directly (frontend rendering via iframe), or stored as video URLs only?iframe.Should there be completion tracking for each lecture, assignment, and quiz in UserProgress? yes there will be.Assignments:
+Will students upload files or just submit links (Google Docs, etc.)?-for now they will just embbed the links, so ask them for link and store their link in our database.Should admin be able to download/view these files/links?- yes ofcourse he can and he has to.Quizzes:
+Should questions be stored as a JSON field, or as a separate Question model?make it seperate quesiton model and give correct options for that particula quesitons, for now make all data dummy based on lecure moduel name.Will quiz scoring be automatic or manually reviewed?-automatic, he just needs to attmpt all quesiotn no matter how much he does correct he can retake that quiz again and can regenrate his score again for his user id so he willl be able to create a new score in db for that particlaur module quiz.Should certificates be generated automatically after a module’s quiz + assignment are completed? yes automatically.Should they be dynamic PDFs (via pdfkit or puppeteer) or static entries (URLs)? if possible to implemetn pdfkit for free then do it in code itslef or make it static urls enties and give a sownlaodbale pdf to student.yes ofcourse:-Should the admin have visibility/download access for all certificates? yes ofcouseShould students be able to re-download old certificates anytime from dashboard? yes ofcousre.Preferred method: JWT, session cookies, or NextAuth (if using Next.js)? JWT.Should login sessions expire automatically after X minutes/hours? yes it should expire automatically but after some general basic minites or avg minutes followed by diffent lms portals.Should all sensitive actions (e.g., deleting a user/course) require 2-step confirmation?- no admin can directly do it.Should admin actions (approvals, rejections, deletions) be logged with timestamps and user IDs? no not nessary it will uneesary increase db.Should failed logins or repeated rejections trigger any temporary bans or alerts? no , not for now atleast.Database type: PostgreSQL, MySQL, or MongoDB (via Prisma)? postgresssql for now ,most porbbaly, if you can suggest something else for my project you can in the next detailed faq's i'll be asking.
+
+Should we add indexing on commonly filtered fields (role, status, createdAt)?- yes please add this for run efficiently—even as your user base scales into the thousands.
+
+Will we deploy backend separately (e.g., on Render, Railway, or AWS EC2)?-AWS EC2
+
+Should backups be automated (daily snapshots)?-backups should be automated with daily snapshots, especially for a system like yours that handles sensitive workflows, user approvals, and learning progress.
+
+Should onDelete cascades be strict (hard delete) or soft (archive before deletion)-LMS-style admin–student portal, soft deletes (archiving before deletion) are the smarter and safer choice
+
+
+there will be a single course created and edited and deleted by admin to user mainly student account, admin is also a user but admin will have most priority based access and will have all edit access and delete all courses and can give access accept or reject users together in bulk and also list of users will be avaible , there wil be list all member i.e users , managers, all  like All
+Members
+Managers
+Pending Approval
+Abandoned checkout and make sure you can export that list from admin panel built in express only for admin , admin can view the request of each and every student reuqest after register on our portal, admin can approve or deny that request after viewing his basic porfile which is made after registering and login and completing his porfie by filling form and basic deatils about him role:- studnent , working , profiessional9as asked in basic survey questions and gather all user data and store it in tbale for later viewsing for amdin while accepting the studnet for the portal or platform reading his entered details , get the detils in amdin panel first in notiifcation with the student name who logged in and fllled form and then in the list of all user or memebers. so after studsents fills the form he will be able to get on to the studnet dahsbord where he  will be shouwn waitng for apprvl of course and he ha to wait until manager or admin, one of the either accepta that stuswnt id with viewing the details,if maabegr accept sthe student request then it should show accpeted in his list if the admin accpet sit should show manager only students list and that partivclaur student id is accpeted in the databse and manager shold be shown accepted requst witth 2 button accept or reeject. then the student will egt notified for the course and his logged in id can view the course content:-first create this logic for backend of admin panel later will desing manager and strudnets access for course.  i wont be aading files but give crud access to admin for this attach link to the particlar contiane rto make it a youtube video lectrure:- give admin access to cretae diffrent modules in a course and diffrent lecurees in a module, and after the assigmnet ,quiz and video completing of student the admin can view the submitted assignment and the quiz score , allow admin to view each students score, their wont be any kindor approvalal or decline for certificate genraton, studet after completing his/her moude with spedific lecurte can genrta ehis won ceritficte based oonn that modue topic for csi portal internsip and admin just have the access to view if thta student id has submitted the assigment ,quiz and has watched the lecute or not, basically we won;t get it if he ahs watched the lectur eor not because for now we are atteahcing youtiube link for all vdieoss lecuree in difffent moduel ofr a single course created by admin.
+
+Member duration
+
+29 day(s)
+Application form details
+
+Name
+
+Besingi Manmadha Rao
+Country
+
+India
+City
+
+Srikakulam
+WhatsApp Mobile Number
+
+6305755279
+Name of the College / Organization ?
+
+Acharyanagarjuna university guntur
+Occupation
+
+Student
+Linkedin Profile Url
+
+https://www.linkedin.com/in/manmadha-besingi?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app
+How did you come to know about Cyber Secured India ?
+
+Friend
+Gender
+
+Male
+Certifications Completed if any
+
+Cloud security Fundamentalsm ,but while signup ask for email or google login, if google signup then redirect direclty to this complete profile section the above question i have asked but if she signsup with wmail she'll put her first name last name country code list will be dropped down and select india by default the inputer text for int will display the country code for eg.india and then she has to type +91 10 didigjta mobile number after that she will put her email id and password and enter, then usiing any smtp or easy mail service whici sends verofication code on mail and enter that mail and verify id it will redirct to the form which will ask all of these,
+
+✅ 1. Use Phase-Based Prompts
+Break your build into these 6 logical phases:
+
+Planning & Schema Design
+
+Backend Development
+
+Approval Workflow & Notifications
+
+Frontend Dashboards
+
+Testing & Certificate Logic
+
+Deployment & Monitoring
+
+Each prompt should focus on just one phase, with clear boundaries.
+
+🧠 2. Start with Intent + Context
+Begin every prompt with:
+
+What you want to build
+
+Why it matters
+
+What tech stack you're using
+
+Example:
+
+“I’m building an LMS admin panel using Express + Prisma + PostgreSQL. I want to generate the Prisma schema for users, courses, modules, lectures, assignments, quizzes, submissions, and certificates. Each course has modules, each module has lectures, and students earn certificates after completing modules.”
+
+🧩 3. Be Specific About Relationships & Logic
+Don’t just say “build a user model”—explain how it connects.
+
+Example:
+
+“Each user can be a student, manager, or admin. Students submit assignments and quizzes. Admins create courses and modules. Managers can approve students. I want the schema to reflect these relationships with foreign keys and composite indexes.”
+
+🔐 4. Mention Role-Based Access & Middleware
+If your system has roles, always define them and their permissions.
+
+Example:
+
+“Use JWT-based auth. Admins can create/edit/delete courses. Managers can approve students. Students can only view approved courses and submit assignments.”
+
+📦 5. Define API Routes & Expected Responses
+Tell Vibe what endpoints you want and how they should behave.
+
+Example:
+
+“Create REST APIs for /api/v1/courses, /modules, /lectures, etc. Use standardized response format:
+
+json
+{
+  "success": true,
+  "data": {...},
+  "message": "Course created successfully"
+}
+🧪 6. Ask for Production-Ready Code
+Use phrases like:
+
+“Production-ready”
+
+“Scalable”
+
+“Modular”
+
+“With error handling”
+
+“With pagination and rate limiting”
+
+Example:
+
+“Generate production-ready Express routes for course CRUD with pagination, error handling, and role-based access control.”
+
+🧰 7. Use Follow-Up Prompts to Refine
+After Vibe generates code, you can say:
+
+“Add soft delete logic”
+
+“Include audit logs”
+
+“Make it compatible with AWS EC2 deployment”
+
+“Add Socket.IO for real-time notifications”
