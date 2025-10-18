@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
+[phases.install]
+cmds = ["cd lms-backend && npm install"]
+
+[phases.build]
+cmds = ["cd lms-backend && npx prisma generate"]
+
+[start]
+cmd = "cd lms-backend && npm start"
